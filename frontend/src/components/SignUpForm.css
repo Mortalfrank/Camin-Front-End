@@ -1,0 +1,84 @@
+.signup-container {
+  max-width: 400px;
+  margin: 0 auto;
+  padding: 20px;
+}
+
+.signup-tabs {
+  display: flex;
+  gap: 10px;
+  margin-bottom: 20px;
+}
+
+.signup-tabs button {
+  flex: 1;
+  padding: 10px;
+  border: 2px solid #646cff;
+  background: transparent;
+  color: #646cff;
+  cursor: pointer;
+  transition: all 0.3s;
+}
+
+.signup-tabs button.active {
+  background: #646cff;
+  color: white;
+}
+
+.form-group {
+  margin-bottom: 15px;
+}
+
+.form-group label {
+  display: block;
+  margin-bottom: 5px;
+  font-weight: 500;
+}
+
+.form-group input,
+.form-group select {
+  width: 100%;
+  padding: 10px;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  font-size: 14px;
+  box-sizing: border-box;
+}
+
+.form-group input:focus,
+.form-group select:focus {
+  outline: none;
+  border-color: #646cff;
+}
+
+form button[type="submit"] {
+  width: 100%;
+  padding: 12px;
+  background: #646cff;
+  color: white;
+  border: none;
+  border-radius: 4px;
+  font-size: 16px;
+  cursor: pointer;
+}
+
+form button[type="submit"]:disabled {
+  background: #999;
+  cursor: not-allowed;
+}
+
+.success-message {
+  color: #4caf50;
+  margin-top: 15px;
+  padding: 10px;
+  background: #e8f5e9;
+  border-radius: 4px;
+}
+
+.error-message {
+  color: #f44336;
+  margin-top: 15px;
+  padding: 10px;
+  background: #ffebee;
+  border-radius: 4px;
+}
