@@ -1,21 +1,19 @@
-// frontend/src/api/client.ts
+// src/api/client.ts
+import { API_BASE_URL } from '../config/env';
 
-// Vite 环境变量（如果之后 TS 报错，再加 vite-env.d.ts，下面会说）
-const API_BASE_URL = import.meta.env.VITE_API_BASE_URL as string;
-
-// 健康检查：返回纯文本
+// Health Check: Returns plain text
 export async function fetchHealth(): Promise<string> {
   const res = await fetch(`${API_BASE_URL}/api/health`);
   return res.text();
 }
 
-// 获取用户列表：暂时用 any，后面可以再加 User 类型
+// To obtain the User list: First use any, and then you can add the user type later
 export async function fetchUsers(): Promise<any> {
   const res = await fetch(`${API_BASE_URL}/api/users`);
   return res.json();
 }
 
-// 创建用户
+// Create the user request body
 export interface CreateUserRequest {
   email: string;
   password: string;
@@ -24,6 +22,7 @@ export interface CreateUserRequest {
   dob: string;
 }
 
+// Creat User
 export async function createUser(data: CreateUserRequest): Promise<any> {
   const res = await fetch(`${API_BASE_URL}/api/users`, {
     method: 'POST',
@@ -33,7 +32,7 @@ export async function createUser(data: CreateUserRequest): Promise<any> {
   return res.json();
 }
 
-// ========== 新增：注册 API ==========
+// ========== Register API ==========
 
 export interface EmailSignUpRequest {
   email: string;
@@ -51,14 +50,14 @@ export interface PhoneSignUpRequest {
   dob: string;
 }
 
-// 后端实际返回结构大概类似：{ userId: 1, error?: string, message?: string }
+// The format returned at the back end
 export interface SignUpResponse {
   userId?: number;
   error?: string;
   message?: string;
 }
 
-// 邮箱注册
+// Email Register
 export async function signUpWithEmail(
   data: EmailSignUpRequest,
 ): Promise<SignUpResponse> {
@@ -70,7 +69,7 @@ export async function signUpWithEmail(
   return res.json();
 }
 
-// 手机号注册
+// Phone Register
 export async function signUpWithPhone(
   data: PhoneSignUpRequest,
 ): Promise<SignUpResponse> {
@@ -81,3 +80,46 @@ export async function signUpWithPhone(
   });
   return res.json();
 }
+
+// ----------------------
+// 🔹 Admin Login API
+// ----------------------
+
+export interface AdminLoginRequest {
+  email: string;
+  password: string;
+}
+
+export interface AdminLoginResponse {
+  id: number;
+  email: string;
+  name: string;
+  role: string;
+}
+
+export async function adminLogin(
+  data: AdminLoginRequest
+): Promise<AdminLoginResponse | { error: string }> {
+  try {
+    const res = await fetch(`${API_BASE_URL}/api/auth/login/email`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(data),
+    });
+
+    // Backend Error（400/401/403/500）
+    if (!res.ok) {
+      const err = await res.json().catch(() => null);
+      return { error: err?.message || err?.error || 'Login failed' };
+    }
+
+    // The format returned by the back end is
+    // {id, email, name, role}
+    const json = (await res.json()) as AdminLoginResponse;
+    return json;
+  } catch (error) {
+    console.error('[adminLogin] Network error:', error);
+    return { error: 'Network error, please try again' };
+  }
+}
+
