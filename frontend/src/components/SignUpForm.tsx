@@ -1,13 +1,21 @@
-// frontend/src/components/SignUpForm.jsx
 import { useState } from 'react';
 import { signUpWithEmail, signUpWithPhone } from '../api/client';
 
+type SignUpMethod = 'email' | 'phone';
+
+interface FormData {
+  email: string;
+  phoneNumber: string;
+  password: string;
+  username: string;
+  gender: 'OTHER' | 'MALE' | 'FEMALE';
+  dob: string;
+}
+
 export default function SignUpForm() {
-  // 切换注册方式：'email' 或 'phone'
-  const [signUpMethod, setSignUpMethod] = useState('email');
-  
-  // 表单数据
-  const [formData, setFormData] = useState({
+  const [signUpMethod, setSignUpMethod] = useState<SignUpMethod>('email');
+
+  const [formData, setFormData] = useState<FormData>({
     email: '',
     phoneNumber: '',
     password: '',
@@ -15,28 +23,27 @@ export default function SignUpForm() {
     gender: 'OTHER',
     dob: '',
   });
-  
-  // 状态
-  const [loading, setLoading] = useState(false);
-  const [message, setMessage] = useState(null);
-  const [error, setError] = useState(null);
 
-  // 处理输入变化
-  const handleChange = (e) => {
+  const [loading, setLoading] = useState<boolean>(false);
+  const [message, setMessage] = useState<string | null>(null);
+  const [error, setError] = useState<string | null>(null);
+
+  // 表单输入处理
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
     const { name, value } = e.target;
     setFormData(prev => ({ ...prev, [name]: value }));
   };
 
   // 提交表单
-  const handleSubmit = async (e) => {
+  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     setLoading(true);
     setMessage(null);
     setError(null);
 
     try {
-      let result;
-      
+      let result: any;
+
       if (signUpMethod === 'email') {
         result = await signUpWithEmail({
           email: formData.email,
@@ -58,8 +65,8 @@ export default function SignUpForm() {
       if (result.error) {
         setError(result.error);
       } else {
-        setMessage(`Registered successfully,User ID: ${result.userId}`);
-        // 清空表单
+        setMessage(`Registered successfully, User ID: ${result.userId}`);
+
         setFormData({
           email: '',
           phoneNumber: '',
@@ -70,8 +77,8 @@ export default function SignUpForm() {
         });
       }
     } catch (err) {
-      setError('Registration failed. Please try again later.');
       console.error(err);
+      setError('Registration failed. Please try again later.');
     } finally {
       setLoading(false);
     }
@@ -80,17 +87,17 @@ export default function SignUpForm() {
   return (
     <div className="signup-container">
       <h2>User registration</h2>
-      
-      {/* 切换注册方式 */}
+
       <div className="signup-tabs">
-        <button 
+        <button
           type="button"
           className={signUpMethod === 'email' ? 'active' : ''}
           onClick={() => setSignUpMethod('email')}
         >
           Registration by email
         </button>
-        <button 
+
+        <button
           type="button"
           className={signUpMethod === 'phone' ? 'active' : ''}
           onClick={() => setSignUpMethod('phone')}
@@ -100,7 +107,6 @@ export default function SignUpForm() {
       </div>
 
       <form onSubmit={handleSubmit}>
-        {/* 邮箱 或 手机号 */}
         {signUpMethod === 'email' ? (
           <div className="form-group">
             <label>Email</label>
@@ -127,7 +133,6 @@ export default function SignUpForm() {
           </div>
         )}
 
-        {/* 密码 */}
         <div className="form-group">
           <label>Password</label>
           <input
@@ -140,7 +145,6 @@ export default function SignUpForm() {
           />
         </div>
 
-        {/* 用户名 */}
         <div className="form-group">
           <label>Username</label>
           <input
@@ -153,9 +157,8 @@ export default function SignUpForm() {
           />
         </div>
 
-        {/* 性别 */}
         <div className="form-group">
-          <label>Gentle</label>
+          <label>Gender</label>
           <select name="gender" value={formData.gender} onChange={handleChange}>
             <option value="OTHER">Other</option>
             <option value="MALE">Male</option>
@@ -163,7 +166,6 @@ export default function SignUpForm() {
           </select>
         </div>
 
-        {/* 出生日期 */}
         <div className="form-group">
           <label>Birthday</label>
           <input
@@ -175,13 +177,11 @@ export default function SignUpForm() {
           />
         </div>
 
-        {/* 提交按钮 */}
         <button type="submit" disabled={loading}>
-          {loading ? 'Registrating...' : 'Register'}
+          {loading ? 'Registering...' : 'Register'}
         </button>
       </form>
 
-      {/* 显示消息 */}
       {message && <p className="success-message">{message}</p>}
       {error && <p className="error-message">{error}</p>}
     </div>
