@@ -1,0 +1,104 @@
+.login-container {
+  max-width: 400px;
+  margin: 0 auto;
+  padding: 20px;
+}
+
+.login-container h2 {
+  margin-bottom: 20px;
+}
+
+/* 登录方式切换标签 */
+.login-tabs {
+  display: flex;
+  gap: 10px;
+  margin-bottom: 20px;
+}
+
+.login-tabs button {
+  flex: 1;
+  padding: 10px;
+  border: 2px solid #646cff;
+  background: transparent;
+  color: #646cff;
+  cursor: pointer;
+  transition: all 0.3s;
+  border-radius: 4px;
+  font-size: 14px;
+}
+
+.login-tabs button.active {
+  background: #646cff;
+  color: white;
+}
+
+.login-tabs button:hover {
+  background: rgba(100, 108, 255, 0.1);
+}
+
+.login-tabs button.active:hover {
+  background: #646cff;
+}
+
+/* 表单样式 */
+.form-group {
+  margin-bottom: 15px;
+}
+
+.form-group label {
+  display: block;
+  margin-bottom: 5px;
+  font-weight: 500;
+}
+
+.form-group input {
+  width: 100%;
+  padding: 10px;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  font-size: 14px;
+  box-sizing: border-box;
+}
+
+.form-group input:focus {
+  outline: none;
+  border-color: #646cff;
+}
+
+.login-container form > button {
+  width: 100%;
+  padding: 12px;
+  background: #646cff;
+  color: white;
+  border: none;
+  border-radius: 4px;
+  font-size: 16px;
+  cursor: pointer;
+  margin-top: 10px;
+}
+
+.login-container form > button:disabled {
+  background: #999;
+  cursor: not-allowed;
+}
+
+.login-container form > button:hover:not(:disabled) {
+  background: #535bf2;
+}
+
+.error-message {
+  color: #f44336;
+  margin-top: 15px;
+  padding: 10px;
+  background: #ffebee;
+  border-radius: 4px;
+}
+
+.signup-link {
+  margin-top: 20px;
+  text-align: center;
+}
+
+.signup-link a {
+  color: #646cff;
+}

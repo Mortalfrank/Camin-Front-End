@@ -81,9 +81,79 @@ export async function signUpWithPhone(
   return res.json();
 }
 
-// ----------------------
-// 🔹 Admin Login API
-// ----------------------
+// ========== Login API ==========
+
+// Login Response (shared by email and phone login)
+export interface LoginResponse {
+  id: number;
+  email: string;
+  username: string;
+  role: 'USER' | 'ADMIN';
+}
+
+export interface LoginErrorResponse {
+  error: string;
+}
+
+// Email Login Request
+export interface EmailLoginRequest {
+  email: string;
+  password: string;
+}
+
+// Phone Login Request
+export interface PhoneLoginRequest {
+  phoneNumber: string;
+  password: string;
+}
+
+// Email Login
+export async function loginWithEmail(
+  data: EmailLoginRequest
+): Promise<LoginResponse | LoginErrorResponse> {
+  try {
+    const res = await fetch(`${API_BASE_URL}/api/auth/login/email`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(data),
+    });
+
+    if (!res.ok) {
+      const err = await res.json().catch(() => null);
+      return { error: err?.message || err?.error || 'Login failed' };
+    }
+
+    return await res.json();
+  } catch (error) {
+    console.error('[loginWithEmail] Network error:', error);
+    return { error: 'Network error, please try again' };
+  }
+}
+
+// Phone Login
+export async function loginWithPhone(
+  data: PhoneLoginRequest
+): Promise<LoginResponse | LoginErrorResponse> {
+  try {
+    const res = await fetch(`${API_BASE_URL}/api/auth/login/phone`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(data),
+    });
+
+    if (!res.ok) {
+      const err = await res.json().catch(() => null);
+      return { error: err?.message || err?.error || 'Login failed' };
+    }
+
+    return await res.json();
+  } catch (error) {
+    console.error('[loginWithPhone] Network error:', error);
+    return { error: 'Network error, please try again' };
+  }
+}
+
+// ========== Admin Login API (optional, if you want to keep it separate) ==========
 
 export interface AdminLoginRequest {
   email: string;
@@ -107,14 +177,11 @@ export async function adminLogin(
       body: JSON.stringify(data),
     });
 
-    // Backend Error（400/401/403/500）
     if (!res.ok) {
       const err = await res.json().catch(() => null);
       return { error: err?.message || err?.error || 'Login failed' };
     }
 
-    // The format returned by the back end is
-    // {id, email, name, role}
     const json = (await res.json()) as AdminLoginResponse;
     return json;
   } catch (error) {
@@ -123,3 +190,10 @@ export async function adminLogin(
   }
 }
 
+// ========== Helper function to check if response is an error ==========
+
+export function isLoginError(
+  response: LoginResponse | LoginErrorResponse
+): response is LoginErrorResponse {
+  return 'error' in response;
+}
