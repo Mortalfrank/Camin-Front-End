@@ -3,7 +3,7 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { adminLogin } from '../api/client';
-
+import './AdminLogin.css';
 type FormErrors = {
   email?: string;
   password?: string;
@@ -61,45 +61,50 @@ export default function AdminLogin() {
     setLoading(false);
   };
 
-  return (
+    return (
     <div className="admin-login-page">
-      <div className="admin-login-card">
+        <div className="admin-login-card">
         <h2>Admin Login</h2>
 
         {errors.form && <p className="admin-login-error">{errors.form}</p>}
 
         <form onSubmit={handleSubmit}>
-          <div>
-            <label>Email</label>
+            
+            {/* Email block */}
+            <div className="form-group">
+            <label htmlFor="admin-email">Email</label>
             <input
-              type="email"
-              value={email}
-              disabled={loading}
-              onChange={(e) => setEmail(e.target.value)}
-              placeholder="admin@example.com"
+                id="admin-email"
+                type="email"
+                value={email}
+                disabled={loading}
+                onChange={(e) => setEmail(e.target.value)}
+                placeholder="admin@example.com"
             />
             {errors.email && <p className="field-error">{errors.email}</p>}
-          </div>
+            </div>
 
-          <div>
-            <label>Password</label>
+            {/* Password block */}
+            <div className="form-group">
+            <label htmlFor="admin-password">Password</label>
             <input
-              type="password"
-              value={password}
-              disabled={loading}
-              onChange={(e) => setPassword(e.target.value)}
-              placeholder="Enter your password"
+                id="admin-password"
+                type="password"
+                value={password}
+                disabled={loading}
+                onChange={(e) => setPassword(e.target.value)}
+                placeholder="Enter your password"
             />
             {errors.password && (
-              <p className="field-error">{errors.password}</p>
+                <p className="field-error">{errors.password}</p>
             )}
-          </div>
+            </div>
 
-          <button type="submit" disabled={loading}>
+            <button type="submit" disabled={loading}>
             {loading ? 'Logging in…' : 'Login'}
-          </button>
+            </button>
         </form>
-      </div>
+        </div>
     </div>
-  );
+    );
 }
