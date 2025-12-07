@@ -1,7 +1,7 @@
 import { StrictMode } from 'react';
 import { createRoot } from 'react-dom/client';
 import './index.css';
-import App from './App'; // 👈 如果 App.tsx 已经存在，这样写就可以
+import App from './App'; 
 
 const container = document.getElementById('root');
 

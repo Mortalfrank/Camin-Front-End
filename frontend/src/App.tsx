@@ -13,26 +13,30 @@ import './App.css';
 function AppLayout() {
   const location = useLocation();
 
-  // The path of the navigation bar is not displayed
-  const hideNavbarRoutes = ['/admin/login','/admin'];
+  // Whether it is an administrator-related route (including /admin and /admin/xxx)
+  const isAdminRoute = location.pathname.startsWith('/admin');
 
-  const shouldHideNavbar = hideNavbarRoutes.includes(location.pathname);
+  // The Administrator router does not display Navbar
+  const shouldHideNavbar = isAdminRoute;
 
   return (
     <>
       {!shouldHideNavbar && <Navbar />}
 
-      <main className="main-content">
+      {/* Only ordinary user pages use the centered width of main-content */}
+      <main className={isAdminRoute ? '' : 'main-content'}>
         <Routes>
+          {/* User front-end page */}
           <Route path="/" element={<Home />} />
           <Route path="/login" element={<Login />} />
           <Route path="/signup" element={<SignUp />} />
 
-          {/* Admin */}
+          {/* Admin login page */}
           <Route path="/admin/login" element={<AdminLogin />} />
-          {/* Admin Layout 包裹所有后台页面 */}
+
+          {/* Admin Layout wraps all background pages */}
           <Route path="/admin" element={<AdminLayout />}>
-            <Route index element={<AdminDashboard />} />  {/* /admin 首页 → Dashboard */}
+            <Route index element={<AdminDashboard />} />
           </Route>
         </Routes>
       </main>
