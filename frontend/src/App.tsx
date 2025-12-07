@@ -5,13 +5,16 @@ import Home from './pages/Home';
 import Login from './pages/Login';
 import SignUp from './pages/SignUp';
 import AdminLogin from './admin/AdminLogin';
+import AdminLayout from './admin/AdminLayout';
+import AdminDashboard from './admin/AdminDashboard';
+
 import './App.css';
 
 function AppLayout() {
   const location = useLocation();
 
   // The path of the navigation bar is not displayed
-  const hideNavbarRoutes = ['/admin/login'];
+  const hideNavbarRoutes = ['/admin/login','/admin'];
 
   const shouldHideNavbar = hideNavbarRoutes.includes(location.pathname);
 
@@ -27,6 +30,10 @@ function AppLayout() {
 
           {/* Admin */}
           <Route path="/admin/login" element={<AdminLogin />} />
+          {/* Admin Layout 包裹所有后台页面 */}
+          <Route path="/admin" element={<AdminLayout />}>
+            <Route index element={<AdminDashboard />} />  {/* /admin 首页 → Dashboard */}
+          </Route>
         </Routes>
       </main>
     </>
