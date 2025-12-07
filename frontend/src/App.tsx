@@ -7,7 +7,7 @@ import SignUp from './pages/SignUp';
 import AdminLogin from './admin/AdminLogin';
 import AdminLayout from './admin/AdminLayout';
 import AdminDashboard from './admin/AdminDashboard';
-
+import ProductsList from './admin/products/ProductList';
 import './App.css';
 
 function AppLayout() {
@@ -37,6 +37,7 @@ function AppLayout() {
           {/* Admin Layout wraps all background pages */}
           <Route path="/admin" element={<AdminLayout />}>
             <Route index element={<AdminDashboard />} />
+            <Route path="products/list" element={<ProductsList />} />
           </Route>
         </Routes>
       </main>
