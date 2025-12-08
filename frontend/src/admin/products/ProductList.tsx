@@ -255,7 +255,7 @@ export default function ProductsList() {
                     <td className="px-3 py-3 text-slate-800">{p.model}</td>
                     <td className="px-3 py-3 text-slate-800">{p.texture}</td>
                     <td className="px-3 py-3 text-right font-semibold text-slate-900">
-                      {p.price?.toFixed ? p.price.toFixed(2) : p.price}
+                      ${p.price?.toFixed ? p.price.toFixed(2) : p.price}
                     </td>
                   </tr>
                 ))}

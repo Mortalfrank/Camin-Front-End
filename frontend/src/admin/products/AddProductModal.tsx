@@ -31,7 +31,9 @@ export default function AddProductModal({
   const [addTexture, setAddTexture] = useState("");
   const [addPrice, setAddPrice] = useState("");
   const [addDescription, setAddDescription] = useState("");
-  const [addImageUrl, setAddImageUrl] = useState("");
+
+  // ✅ 图片文件（而不是 URL）
+  const [imageFile, setImageFile] = useState<File | null>(null);
 
   const [addSaving, setAddSaving] = useState(false);
   const [addFormError, setAddFormError] = useState<string | null>(null);
@@ -46,7 +48,7 @@ export default function AddProductModal({
       setAddTexture("");
       setAddPrice("");
       setAddDescription("");
-      setAddImageUrl("");
+      setImageFile(null);
       setAddFormError(null);
       setAddSaving(false);
     }
@@ -76,29 +78,33 @@ export default function AddProductModal({
       setAddFormError("Price must be a valid non-negative number.");
       return;
     }
+    if (!imageFile) {
+      setAddFormError("Product image file is required.");
+      return;
+    }
 
     setAddFormError(null);
     setAddSaving(true);
 
     try {
-      const newProductPayload = {
-        name: addName.trim(),
-        series: addSeries.trim() || null,
-        brand: addBrand.trim() || null,
-        model: addModel.trim() || null,
-        description: addDescription.trim() || null,
-        texture: addTexture.trim() || "",
-        price: priceNumber,
-        stock: 0,
-        mainImageUrl: addImageUrl.trim() || null,
-      };
+      // ✅ 使用 FormData 发送 multipart/form-data（带文件）
+      const formData = new FormData();
+      formData.append("name", addName.trim());
+      formData.append("series", addSeries.trim());
+      formData.append("brand", addBrand.trim());
+      formData.append("model", addModel.trim());
+      formData.append("description", addDescription.trim());
+      formData.append("texture", addTexture.trim());
+      formData.append("price", String(priceNumber));
+      formData.append("stock", "0"); // 新增默认库存 0
+
+      // 这里 "image" 是后端接收的字段名，你可以按需要改成 "file" 等
+      formData.append("image", imageFile);
 
       const res = await fetch("http://localhost:8080/api/products", {
         method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify(newProductPayload),
+        body: formData,
+        // ❌ 不要手动设置 Content-Type，浏览器会自动加 boundary
       });
 
       if (!res.ok) {
@@ -135,7 +141,7 @@ export default function AddProductModal({
             <h3 className="text-lg font-semibold">Add Product Step</h3>
             <p className="mt-1 text-xs text-slate-500">
               Administrator click Add button → pop up new window and input
-              product information, then click Save.
+              product information, then upload product picture and click Save.
             </p>
           </div>
           <button
@@ -248,22 +254,26 @@ export default function AddProductModal({
             />
           </div>
 
+          {/* ✅ 图片文件上传 */}
           <div>
             <label className="block text-sm font-medium text-slate-700">
-              Product Picture URL
+              Product Picture <span className="text-red-500">*</span>
             </label>
             <input
-              type="text"
-              placeholder="e.g. http://localhost:8080/products/hc-cream-1.jpg"
-              value={addImageUrl}
-              onChange={(e) => setAddImageUrl(e.target.value)}
-              className="mt-1 w-full rounded-md border border-slate-300 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-emerald-500"
+              type="file"
+              accept="image/*"
+              onChange={(e) => {
+                const file = e.target.files?.[0] || null;
+                setImageFile(file);
+              }}
+              className="mt-1 w-full text-sm text-slate-700 file:mr-3 file:rounded-md file:border-0 file:bg-emerald-50 file:px-3 file:py-2 file:text-sm file:font-medium file:text-emerald-700 hover:file:bg-emerald-100"
               disabled={addSaving}
             />
-            <p className="mt-1 text-[11px] text-slate-400">
-              For now, please paste an image URL. Later we can support real file
-              upload.
-            </p>
+            {imageFile && (
+              <p className="mt-1 text-xs text-slate-500">
+                Selected: {imageFile.name}
+              </p>
+            )}
           </div>
         </div>
 
