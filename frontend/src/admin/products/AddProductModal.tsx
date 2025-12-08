@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 const MAX_OTHER_IMAGES = 9;
 const MAX_FILE_SIZE = 10 * 1024 * 1024; // 10MB
+const ALLOWED_TYPES = ["image/jpeg", "image/png"];
 
 export type Product = {
   id: number;
@@ -22,46 +23,52 @@ type AddProductModalProps = {
 };
 
 export default function AddProductModal({
-  isOpen,
-  onClose,
-  onSuccess,
+    isOpen,
+    onClose,
+    onSuccess,
 }: AddProductModalProps) {
-  const [addName, setAddName] = useState("");
-  const [addSeries, setAddSeries] = useState("");
-  const [addBrand, setAddBrand] = useState("");
-  const [addModel, setAddModel] = useState("");
-  const [addTexture, setAddTexture] = useState("");
-  const [addPrice, setAddPrice] = useState("");
-  const [addDescription, setAddDescription] = useState("");
+    const [addName, setAddName] = useState("");
+    const [addSeries, setAddSeries] = useState("");
+    const [addBrand, setAddBrand] = useState("");
+    const [addModel, setAddModel] = useState("");
+    const [addTexture, setAddTexture] = useState("");
+    const [addPrice, setAddPrice] = useState("");
+    const [addDescription, setAddDescription] = useState("");
 
-  // ✅ 主图（必填，单张）
-  const [mainImageFile, setMainImageFile] = useState<File | null>(null);
-  // ✅ 其他图片（可选，多张）
-  const [otherImageFiles, setOtherImageFiles] = useState<File[]>([]);
+    // ✅ 主图（必填，单张）
+    const [mainImageFile, setMainImageFile] = useState<File | null>(null);
+    // ✅ 其他图片（可选，多张）
+    const [otherImageFiles, setOtherImageFiles] = useState<File[]>([]);
 
-  const [addSaving, setAddSaving] = useState(false);
-  const [addFormError, setAddFormError] = useState<string | null>(null);
+    // ✅ 主图预览
+    const [mainImagePreview, setMainImagePreview] = useState<string | null>(null);
+    // ✅ 其他图片预览
+    const [otherImagePreviews, setOtherImagePreviews] = useState<string[]>([]);
+    const [addSaving, setAddSaving] = useState(false);
+    const [addFormError, setAddFormError] = useState<string | null>(null);
 
-  // 每次打开弹窗时重置表单
-  useEffect(() => {
-    if (isOpen) {
-      setAddName("");
-      setAddSeries("");
-      setAddBrand("");
-      setAddModel("");
-      setAddTexture("");
-      setAddPrice("");
-      setAddDescription("");
-      setMainImageFile(null);
-      setOtherImageFiles([]);
-      setAddFormError(null);
-      setAddSaving(false);
+    // 每次打开弹窗时重置表单
+    useEffect(() => {
+        if (isOpen) {
+        setAddName("");
+        setAddSeries("");
+        setAddBrand("");
+        setAddModel("");
+        setAddTexture("");
+        setAddPrice("");
+        setAddDescription("");
+        setMainImageFile(null);
+        setOtherImageFiles([]);
+        setMainImagePreview(null);        
+        setOtherImagePreviews([]);        
+        setAddFormError(null);
+        setAddSaving(false);
+        }
+    }, [isOpen]);
+
+    if (!isOpen) {
+        return null;
     }
-  }, [isOpen]);
-
-  if (!isOpen) {
-    return null;
-  }
 
   const handleClose = () => {
     if (addSaving) return;
@@ -87,7 +94,7 @@ export default function AddProductModal({
       setAddFormError("Product main picture is required.");
       return;
     }
-    // ✅ 添加主图大小验证
+    // 添加主图大小验证
     if (mainImageFile.size > MAX_FILE_SIZE) {
         setAddFormError("Main picture size cannot exceed 10MB.");
         return;
@@ -323,67 +330,109 @@ export default function AddProductModal({
               product image.
             </p>
             <input
-              type="file"
-              accept="image/*"
-              onChange={(e) => {
+                type="file"
+                accept="image/*"
+                onChange={(e) => {
                 const file = e.target.files?.[0] || null;
+                
+                // 文件格式验证：只允许 JPG / PNG
+                if (!ALLOWED_TYPES.includes(file.type)) {
+                    setAddFormError("Only JPG and PNG images are allowed.");
+                    e.target.value = "";
+                    return;
+                }
+                // 清理旧的预览 URL，避免内存泄露
+                if (mainImagePreview) {
+                    URL.revokeObjectURL(mainImagePreview);
+                }
+
                 setMainImageFile(file);
-              }}
-              className="mt-2 w-full cursor-pointer text-sm text-slate-700 file:mr-3 file:cursor-pointer file:rounded-md file:border-0 file:bg-emerald-500 file:px-4 file:py-2 file:text-sm file:font-medium file:text-white hover:file:bg-emerald-600"
-              disabled={addSaving}
+
+                if (file) {
+                    const previewUrl = URL.createObjectURL(file);
+                    setMainImagePreview(previewUrl);
+                } else {
+                    setMainImagePreview(null);
+                }
+                }}
+                className="mt-2 w-full cursor-pointer text-sm text-slate-700 file:mr-3 file:cursor-pointer file:rounded-md file:border-0 file:bg-emerald-500 file:px-4 file:py-2 file:text-sm file:font-medium file:text-white hover:file:bg-emerald-600"
+                disabled={addSaving}
             />
-            {mainImageFile && (
-              <p className="mt-1 text-xs text-slate-500">
-                Selected main picture: {mainImageFile.name}
-              </p>
+
+            {/* ✅ 显示主图缩略图（而不是文件名） */}
+            {mainImagePreview && (
+                <div className="mt-2">
+                <img
+                    src={mainImagePreview}
+                    alt="Main product preview"
+                    className="h-24 w-24 rounded-md border border-slate-200 object-cover"
+                />
+                </div>
             )}
           </div>
 
           {/* 其他图片上传 */}
-<div className="rounded-lg border border-slate-200 bg-slate-50/60 p-3">
-  <label className="block text-sm font-medium text-slate-800">
-    Product Other Pictures
-  </label>
-  <p className="mt-1 text-xs text-slate-500">
-    Optional. You can upload up to {MAX_OTHER_IMAGES} images (max 10MB each).
-  </p>
-  <input
-    type="file"
-    accept="image/*"
-    multiple
-    onChange={(e) => {
-      const files = e.target.files ? Array.from(e.target.files) : [];
-      
-      // ✅ 实时验证数量
-      if (files.length > MAX_OTHER_IMAGES) {
-        setAddFormError(
-          `You can only select up to ${MAX_OTHER_IMAGES} pictures. You selected ${files.length}.`
-        );
-        e.target.value = ""; // 清空选择
-        return;
-      }
-      
-      // ✅ 实时验证大小
-      const oversized = files.filter(f => f.size > MAX_FILE_SIZE);
-      if (oversized.length > 0) {
-        setAddFormError(
-          `${oversized.length} file(s) exceed 10MB. Please select smaller files.`
-        );
-        e.target.value = "";
-        return;
-      }
-      
-      setAddFormError(null);
-      setOtherImageFiles(files);
-    }}
-    className="mt-2 w-full cursor-pointer text-sm text-slate-700 file:mr-3 file:cursor-pointer file:rounded-md file:border-0 file:bg-emerald-100 file:px-4 file:py-2 file:text-sm file:font-medium file:text-emerald-700 hover:file:bg-emerald-200"
-    disabled={addSaving}
-  />
-  {otherImageFiles.length > 0 && (
-    <p className="mt-1 text-xs text-slate-500">
-      Selected {otherImageFiles.length} other{" "}
-      {otherImageFiles.length === 1 ? "picture" : "pictures"}.
-    </p>
+        <div className="rounded-lg border border-slate-200 bg-slate-50/60 p-3">
+        <label className="block text-sm font-medium text-slate-800">
+            Product Other Pictures
+        </label>
+        <p className="mt-1 text-xs text-slate-500">
+            Optional. You can upload up to {MAX_OTHER_IMAGES} images (max 10MB each).
+        </p>
+        <input
+            type="file"
+            accept="image/*"
+            multiple
+            onChange={(e) => {
+            const files = e.target.files ? Array.from(e.target.files) : [];
+
+            // 👉 检查格式（允许 JPG & PNG）
+            const invalidFormat = files.filter(
+                (f) => !ALLOWED_TYPES.includes(f.type)
+            );
+
+            if (invalidFormat.length > 0) {
+                setAddFormError("Only JPG and PNG images are allowed.");
+                e.target.value = "";
+                return;
+            }
+
+            // ✅ 实时验证大小
+            const oversized = files.filter((f) => f.size > MAX_FILE_SIZE);
+            if (oversized.length > 0) {
+                setAddFormError(
+                `${oversized.length} file(s) exceed 10MB. Please select smaller files.`
+                );
+                e.target.value = "";
+                return;
+            }
+
+            setAddFormError(null);
+            setOtherImageFiles(files);
+
+            // 先清理旧的预览 URL
+            otherImagePreviews.forEach((url) => URL.revokeObjectURL(url));
+
+            // 新建预览 URL 列表
+            const previews = files.map((f) => URL.createObjectURL(f));
+            setOtherImagePreviews(previews);
+            }}
+            className="mt-2 w-full cursor-pointer text-sm text-slate-700 file:mr-3 file:cursor-pointer file:rounded-md file:border-0 file:bg-emerald-100 file:px-4 file:py-2 file:text-sm file:font-medium file:text-emerald-700 hover:file:bg-emerald-200"
+            disabled={addSaving}
+        />
+
+  {/* ✅ 显示其他图片缩略图 */}
+  {otherImagePreviews.length > 0 && (
+    <div className="mt-2 grid grid-cols-5 gap-2">
+      {otherImagePreviews.map((url, index) => (
+        <img
+          key={index}
+          src={url}
+          alt={`Other product preview ${index + 1}`}
+          className="h-24 w-24 rounded-md border border-slate-200 object-cover"
+        />
+      ))}
+    </div>
   )}
 </div>
 
