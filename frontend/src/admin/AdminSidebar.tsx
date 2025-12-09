@@ -6,6 +6,9 @@ export default function AdminSidebar() {
   const [openProducts, setOpenProducts] = useState(
     location.pathname.startsWith("/admin/products")
   );
+  const [openAnalytics, setOpenAnalytics] = useState(
+    location.pathname.startsWith("/admin/analytics")
+  );
 
   return (
     <aside className="flex w-60 flex-col bg-slate-200 text-black-950">
@@ -61,8 +64,51 @@ export default function AdminSidebar() {
           People
         </div>
 
-        <div className="cursor-pointer rounded-md px-3 py-2 text-sm transition hover:bg-slate-100">
-          Analytics
+        <button
+          type="button"
+          onClick={() => setOpenAnalytics(!openAnalytics)}
+          className="flex w-full items-center justify-between rounded-md px-3 py-2 text-left text-sm !font-normal
+            transition hover:bg-slate-100 !bg-slate-200"
+        >
+          <span>Analytics</span>
+          <span className="text-xs">{openAnalytics ? "▾" : "▸"}</span>
+        </button>
+
+        <div
+          className={`ml-6 space-y-1 overflow-hidden transition-all duration-200 ${
+            openAnalytics ? "max-h-40 opacity-100" : "max-h-0 opacity-0"
+          }`}
+        >
+          <Link
+            to="/admin/analytics/sales"
+            className={`block rounded-md px-3 py-2 text-sm no-underline transition hover:bg-slate-100 ${
+              location.pathname.includes("/admin/analytics/sales")
+                ? "bg-slate-100 font-semibold"
+                : ""
+            }`}
+          >
+            Sales Analytics
+          </Link>
+          <Link
+            to="/admin/analytics/products"
+            className={`block rounded-md px-3 py-2 text-sm no-underline transition hover:bg-slate-100 ${
+              location.pathname.includes("/admin/analytics/products")
+                ? "bg-slate-100 font-semibold"
+                : ""
+            }`}
+          >
+            Product Analytics
+          </Link>
+          <Link
+            to="/admin/analytics/customers"
+            className={`block rounded-md px-3 py-2 text-sm no-underline transition hover:bg-slate-100 ${
+              location.pathname.includes("/admin/analytics/customers")
+                ? "bg-slate-100 font-semibold"
+                : ""
+            }`}
+          >
+            Customer Analytics
+          </Link>
         </div>
 
         <div className="cursor-pointer rounded-md px-3 py-2 text-sm transition hover:bg-slate-100">

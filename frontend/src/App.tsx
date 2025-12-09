@@ -8,6 +8,9 @@ import AdminLogin from './admin/AdminLogin';
 import AdminLayout from './admin/AdminLayout';
 import AdminDashboard from './admin/AdminDashboard';
 import ProductsList from './admin/products/ProductList';
+import SalesAnalytics from './admin/analytics/SalesAnalytics';
+import ProductAnalytics from './admin/analytics/ProductAnalytics';
+import CustomerAnalytics from './admin/analytics/CustomerAnalytics';
 import './App.css';
 
 function AppLayout() {
@@ -38,6 +41,9 @@ function AppLayout() {
           <Route path="/admin" element={<AdminLayout />}>
             <Route index element={<AdminDashboard />} />
             <Route path="products/list" element={<ProductsList />} />
+            <Route path="analytics/sales" element={<SalesAnalytics />} />
+            <Route path="analytics/products" element={<ProductAnalytics />} />
+            <Route path="analytics/customers" element={<CustomerAnalytics />} />
           </Route>
         </Routes>
       </main>
