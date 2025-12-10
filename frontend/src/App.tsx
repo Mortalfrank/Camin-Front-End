@@ -11,6 +11,7 @@ import ProductsList from './admin/products/ProductList';
 import SalesAnalytics from './admin/analytics/SalesAnalytics';
 import ProductAnalytics from './admin/analytics/ProductAnalytics';
 import CustomerAnalytics from './admin/analytics/CustomerAnalytics';
+import Profile from './pages/Profile';
 import './App.css';
 
 function AppLayout() {
@@ -33,6 +34,8 @@ function AppLayout() {
           <Route path="/" element={<Home />} />
           <Route path="/login" element={<Login />} />
           <Route path="/signup" element={<SignUp />} />
+
+          <Route path="/profile" element={<Profile />} />
 
           {/* Admin login page */}
           <Route path="/admin/login" element={<AdminLogin />} />

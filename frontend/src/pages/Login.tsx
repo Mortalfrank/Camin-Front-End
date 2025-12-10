@@ -52,14 +52,18 @@ export default function Login() {
       if (isLoginError(result)) {
         setError(result.error);
       } else {
-        // Login success
-        login(result);
-        
+        // 检查是否是 ADMIN 账户，如果是则拒绝登录
         if (result.role === 'ADMIN') {
-          navigate('/admin');
-        } else {
-          navigate('/dashboard');
+          setError(loginMethod === 'email' 
+            ? 'Invalid email or password' 
+            : 'Invalid phone number or password'
+          );
+          return;
         }
+
+        // USER 账户正常登录
+        login(result);
+        navigate('/dashboard');
       }
     } catch (err) {
       setError('Login failed, please try again later');

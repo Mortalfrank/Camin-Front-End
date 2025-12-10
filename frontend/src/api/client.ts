@@ -197,3 +197,67 @@ export function isLoginError(
 ): response is LoginErrorResponse {
   return 'error' in response;
 }
+
+// ========== Profile API ==========
+
+export interface ProfileResponse {
+  id: number;
+  email: string;
+  username: string;
+  gender: 'MALE' | 'FEMALE' | 'OTHER';
+  phoneNumber: string;
+  dob: string;
+  role: 'USER' | 'ADMIN';
+}
+
+export interface UpdateProfileRequest {
+  username?: string;
+  gender?: 'MALE' | 'FEMALE' | 'OTHER';
+  dob?: string;
+  phoneNumber?: string;
+  email?: string;
+}
+
+// 获取用户信息
+export async function getProfile(userId: number): Promise<ProfileResponse | { error: string }> {
+  try {
+    const res = await fetch(`${API_BASE_URL}/api/profile/${userId}`);
+    if (!res.ok) {
+      const err = await res.json().catch(() => null);
+      return { error: err?.error || 'Failed to fetch profile' };
+    }
+    return await res.json();
+  } catch (error) {
+    console.error('[getProfile] Network error:', error);
+    return { error: 'Network error, please try again' };
+  }
+}
+
+// 更新用户信息
+export async function updateProfile(
+  userId: number, 
+  data: UpdateProfileRequest
+): Promise<ProfileResponse | { error: string }> {
+  try {
+    const res = await fetch(`${API_BASE_URL}/api/profile/${userId}`, {
+      method: 'PUT',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(data),
+    });
+    if (!res.ok) {
+      const err = await res.json().catch(() => null);
+      return { error: err?.error || 'Failed to update profile' };
+    }
+    return await res.json();
+  } catch (error) {
+    console.error('[updateProfile] Network error:', error);
+    return { error: 'Network error, please try again' };
+  }
+}
+
+// Helper function
+export function isProfileError(
+  response: ProfileResponse | { error: string }
+): response is { error: string } {
+  return 'error' in response;
+}

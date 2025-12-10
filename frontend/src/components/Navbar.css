@@ -16,7 +16,8 @@
 
 .navbar-links {
   display: flex;
-  gap: 20px;
+  align-items: center;
+  gap: 15px;
 }
 
 .navbar-links a {
@@ -29,4 +30,28 @@
 
 .navbar-links a:hover {
   background: rgba(255, 255, 255, 0.2);
+}
+
+.user-info {
+  color: white;
+  padding: 8px 12px;
+  background: rgba(255, 255, 255, 0.15);
+  border-radius: 4px;
+  font-weight: 500;
+  white-space: nowrap;
+}
+
+.logout-btn {
+  background: #1a1a1a;
+  color: white;
+  border: none;
+  padding: 8px 16px;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 14px;
+  transition: background 0.3s;
+}
+
+.logout-btn:hover {
+  background: #333;
 }
