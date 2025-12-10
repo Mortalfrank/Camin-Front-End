@@ -12,7 +12,7 @@ export default function Profile() {
     username: '',
     email: '',
     phoneNumber: '',
-    gender: 'OTHER' as 'MALE' | 'FEMALE' | 'OTHER',
+    gender: '',
     dob: '',
   });
   const [loading, setLoading] = useState(true);
@@ -32,12 +32,22 @@ export default function Profile() {
       if (isProfileError(result)) {
         setError(result.error);
       } else {
+        // 格式化日期为 YYYY-MM-DD（input type="date" 需要的格式）
+        let formattedDob = '';
+        if (result.dob) {
+          // 处理可能的日期格式
+          const date = new Date(result.dob);
+          if (!isNaN(date.getTime())) {
+            formattedDob = date.toISOString().split('T')[0];
+          }
+        }
+
         setFormData({
           username: result.username || '',
           email: result.email || '',
           phoneNumber: result.phoneNumber || '',
-          gender: result.gender || 'OTHER',
-          dob: result.dob || '',
+          gender: result.gender || '',
+          dob: formattedDob,
         });
       }
       setLoading(false);
@@ -132,9 +142,10 @@ export default function Profile() {
         <div className="form-group">
           <label>Gender</label>
           <select name="gender" value={formData.gender} onChange={handleChange}>
+            <option value="">Select Gender</option>
+            <option value="M">Male</option>
+            <option value="F">Female</option>
             <option value="OTHER">Other</option>
-            <option value="MALE">Male</option>
-            <option value="FEMALE">Female</option>
           </select>
         </div>
 
@@ -146,6 +157,7 @@ export default function Profile() {
             value={formData.dob}
             onChange={handleChange}
             required
+            max={new Date().toISOString().split('T')[0]}
           />
         </div>
 

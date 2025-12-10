@@ -204,7 +204,7 @@ export interface ProfileResponse {
   id: number;
   email: string;
   username: string;
-  gender: 'MALE' | 'FEMALE' | 'OTHER';
+  gender: string;
   phoneNumber: string;
   dob: string;
   role: 'USER' | 'ADMIN';
@@ -212,7 +212,7 @@ export interface ProfileResponse {
 
 export interface UpdateProfileRequest {
   username?: string;
-  gender?: 'MALE' | 'FEMALE' | 'OTHER';
+  gender?: string;
   dob?: string;
   phoneNumber?: string;
   email?: string;
