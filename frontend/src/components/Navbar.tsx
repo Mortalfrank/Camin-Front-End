@@ -22,6 +22,13 @@ export default function Navbar() {
         <Link to="/products">Products</Link>
         {isLoggedIn() ? (
           <>
+            
+            {isAdmin() ? (
+              <Link to="/admin">Admin</Link>
+            ) : (
+              <Link to="/dashboard">Dashboard</Link>
+            )}
+            <Link to="/profile">Profile</Link>
             <Link to="/cart" className="relative flex items-center gap-2">
               <CartIcon size={20} />
               <span>Cart</span>
@@ -31,31 +38,24 @@ export default function Navbar() {
                 </span>
               )}
             </Link>
-            <span className="text-gray-600">{user?.username}</span>
+            <span className="user-info">Hi, {user.username || 'User'}</span>
             <button onClick={logout} className="text-red-600 hover:text-red-800">
               Logout
             </button>
           </>
         ) : (
           <>
-            
-        {user ? (
-          <>
-            {isAdmin() ? (
-              <Link to="/admin">Admin</Link>
-            ) : (
-              <Link to="/dashboard">Dashboard</Link>
-            )}
-            <Link to="/profile">Profile</Link>
-            <span className="user-info">Hi, {user.username || 'User'}</span>
-            <button onClick={handleLogout} className="logout-btn">Logout</button>
-          </>
-        ) : (
-          <>
-            <Link to="/login">Login</Link>
-                <Link to="/signup">Sign Up</Link>
-          </>
-        )}
+            <Link to="/cart" className="relative flex items-center gap-2">
+              <CartIcon size={20} />
+              <span>Cart</span>
+              {itemCount > 0 && (
+                <span className="absolute -top-2 -right-2 bg-red-500 text-white text-xs rounded-full w-5 h-5 flex items-center justify-center">
+                  {itemCount}
+                </span>
+              )}
+            </Link>
+             <Link to="/login">Login</Link>
+             <Link to="/signup">Sign Up</Link>
           </>
         )}
       </div>
