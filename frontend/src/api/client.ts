@@ -261,3 +261,87 @@ export function isProfileError(
 ): response is { error: string } {
   return 'error' in response;
 }
+// ========== Cart API ==========
+export interface AddToCartRequest {
+  productId: number;
+  quantity: number;
+}
+
+export async function addToCart(data: AddToCartRequest): Promise<any> {
+  const res = await fetch(`${API_BASE_URL}/api/cart/add`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(data),
+  });
+  if (!res.ok) throw new Error('Failed to add to cart');
+  return res.json();
+}
+
+export async function getCart(): Promise<any> {
+  const res = await fetch(`${API_BASE_URL}/api/cart`);
+  if (!res.ok) throw new Error('Failed to fetch cart');
+  return res.json();
+}
+
+export async function updateCartItemQuantity(cartItemId: number, quantity: number): Promise<any> {
+  const res = await fetch(`${API_BASE_URL}/api/cart/items/${cartItemId}`, {
+    method: 'PUT',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ quantity }),
+  });
+  if (!res.ok) throw new Error('Failed to update quantity');
+  return res.json();
+}
+
+export async function removeCartItem(cartItemId: number): Promise<void> {
+  const res = await fetch(`${API_BASE_URL}/api/cart/items/${cartItemId}`, {
+    method: 'DELETE',
+  });
+  if (!res.ok) throw new Error('Failed to remove item');
+}
+
+export async function clearCart(): Promise<void> {
+  const res = await fetch(`${API_BASE_URL}/api/cart`, {
+    method: 'DELETE',
+  });
+  if (!res.ok) throw new Error('Failed to clear cart');
+}
+
+// ========== Order API ==========
+export interface CheckoutRequest {
+  paymentMethod: string;
+}
+
+export interface Order {
+  id: number;
+  state: string;
+  totalAmount: number;
+  paymentMethod: string;
+  createdAt: string;
+  items: any[];
+}
+
+export async function checkout(data: CheckoutRequest): Promise<Order> {
+  const res = await fetch(`${API_BASE_URL}/api/orders/checkout`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(data),
+  });
+  if (!res.ok) {
+    const error = await res.json();
+    throw new Error(error.error || 'Checkout failed');
+  }
+  return res.json();
+}
+
+export async function getUserOrders(): Promise<Order[]> {
+  const res = await fetch(`${API_BASE_URL}/api/orders`);
+  if (!res.ok) throw new Error('Failed to fetch orders');
+  return res.json();
+}
+
+export async function getOrder(orderId: number): Promise<Order> {
+  const res = await fetch(`${API_BASE_URL}/api/orders/${orderId}`);
+  if (!res.ok) throw new Error('Failed to fetch order');
+  return res.json();
+}
