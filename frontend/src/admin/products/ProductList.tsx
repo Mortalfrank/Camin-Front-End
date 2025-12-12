@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import AddProductModal, { Product } from "./AddProductModal";
+import EditProductModal from "./EditProductModal";
 
 type ToastState = {
   message: string;
@@ -13,8 +14,13 @@ export default function ProductsList() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
+  const [editingProduct, setEditingProduct] = useState<Product | null>(null);
+
   // 控制 Add 弹窗
   const [isAddModalOpen, setIsAddModalOpen] = useState(false);
+
+  // 控制 Edit 弹窗
+  const [isEditOpen, setIsEditOpen] = useState(false);
 
   // Toast（右下角绿色/红色提示）
   const [toast, setToast] = useState<ToastState | null>(null);
@@ -71,6 +77,43 @@ export default function ProductsList() {
     showToast("Successfully added product.", "success");
   };
 
+  /** 点击 Edit 按钮：只在 canEdit=true 时打开弹窗 */
+  const handleOpenEditModal = () => {
+    if (!canEdit) return;
+
+    // 找到被选中的那一条记录
+    const selectedIdStr = Object.keys(selectedRows).find((id) => {
+      const numId = Number(id);
+      return selectedRows[numId];
+    });
+
+    if (!selectedIdStr) return;
+
+    const selectedId = Number(selectedIdStr);
+    const productToEdit = products.find((p) => p.id === selectedId) || null;
+
+    if (productToEdit) {
+      setEditingProduct(productToEdit);
+      setIsEditOpen(true);
+    }
+  };
+
+  /** Edit 弹窗关闭 */
+  const handleCloseEditModal = () => {
+    setIsEditOpen(false);
+    // 编辑完可以保留选择状态，也可以顺便清理掉：
+    // setSelectedRows({});
+    // setSelectedAll(false);
+  };
+
+  /** 编辑成功：更新列表中的对应记录 + toast */
+  const handleEditSuccess = (updated: Product) => {
+    setProducts((prev) =>
+      prev.map((p) => (p.id === updated.id ? updated : p)),
+    );
+    showToast("Successfully updated product.", "success");
+  };
+
   return (
     <div className="space-y-4">
       {/* Page Title */}
@@ -105,11 +148,12 @@ export default function ProductsList() {
             <button
               type="button"
               disabled={!canEdit}
+              onClick={handleOpenEditModal}
               className={`rounded-md border border-slate-300 bg-white px-4 py-2 text-sm font-medium shadow-sm transition
                     ${
                       canEdit
-                        ? "text-slate-800 hover:bg-slate-100 cursor-pointer"
-                        : "text-slate-400 cursor-not-allowed opacity-60"
+                        ? "cursor-pointer text-slate-800 hover:bg-slate-100"
+                        : "cursor-not-allowed text-slate-400 opacity-60"
                     }`}
             >
               Edit
@@ -122,8 +166,8 @@ export default function ProductsList() {
               className={`rounded-md border border-red-200 bg-white px-4 py-2 text-sm font-medium shadow-sm transition
                     ${
                       canDelete
-                        ? "text-red-600 hover:bg-red-50 cursor-pointer"
-                        : "text-red-300 cursor-not-allowed opacity-60"
+                        ? "cursor-pointer text-red-600 hover:bg-red-50"
+                        : "cursor-not-allowed text-red-300 opacity-60"
                     }`}
             >
               Delete
@@ -237,7 +281,7 @@ export default function ProductsList() {
                       <div className="h-12 w-12 overflow-hidden rounded-md bg-slate-200">
                         <img
                           src={
-                            p.mainImageUrl ||
+                            (p as any).mainImageUrl ||
                             "https://via.placeholder.com/64x64.png?text=Img"
                           }
                           alt={p.name}
@@ -269,6 +313,14 @@ export default function ProductsList() {
         isOpen={isAddModalOpen}
         onClose={handleCloseAddModal}
         onSuccess={handleAddSuccess}
+      />
+
+      {/* Edit Product 弹窗组件 */}
+      <EditProductModal
+        isOpen={isEditOpen}
+        product={editingProduct}
+        onClose={handleCloseEditModal}
+        onSuccess={handleEditSuccess}
       />
 
       {/* 右下角 Toast 提示 */}
