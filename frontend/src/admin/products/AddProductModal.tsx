@@ -75,6 +75,19 @@ export default function AddProductModal({
     onClose();
   };
 
+  const handleRemoveOtherImage = (index: number) => {
+  setOtherImageFiles((prev) => prev.filter((_, i) => i !== index));
+
+  setOtherImagePreviews((prev) => {
+    const toRemove = prev[index];
+    if (toRemove) {
+      URL.revokeObjectURL(toRemove); // 释放内存
+    }
+    return prev.filter((_, i) => i !== index);
+  });
+};
+
+
   const handleSaveNewProduct = async () => {
     // ⚠️ 保持原有校验逻辑，只把 image 的校验改为 mainImageFile
     if (!addName.trim()) {
@@ -191,7 +204,7 @@ export default function AddProductModal({
         <div className="mb-4 flex items-start justify-between">
           <div>
             <h3 className="text-xl font-semibold text-slate-900">
-              Add Product Step
+              Add Product
             </h3>
             <p className="mt-1 text-xs text-slate-500">
               Administrator click Add button → pop up new window and input
@@ -335,6 +348,13 @@ export default function AddProductModal({
                 onChange={(e) => {
                 const file = e.target.files?.[0] || null;
                 
+                if (!file) {
+                    setMainImageFile(null);
+                    if (mainImagePreview) URL.revokeObjectURL(mainImagePreview);
+                    setMainImagePreview(null);
+                    return;
+                }
+
                 // 文件格式验证：只允许 JPG / PNG
                 if (!ALLOWED_TYPES.includes(file.type)) {
                     setAddFormError("Only JPG and PNG images are allowed.");
@@ -371,70 +391,92 @@ export default function AddProductModal({
             )}
           </div>
 
-          {/* 其他图片上传 */}
-        <div className="rounded-lg border border-slate-200 bg-slate-50/60 p-3">
-        <label className="block text-sm font-medium text-slate-800">
-            Product Other Pictures
-        </label>
-        <p className="mt-1 text-xs text-slate-500">
-            Optional. You can upload up to {MAX_OTHER_IMAGES} images (max 10MB each).
-        </p>
-        <input
-            type="file"
-            accept="image/*"
-            multiple
-            onChange={(e) => {
-            const files = e.target.files ? Array.from(e.target.files) : [];
+        {/* 其他图片上传 */}
+<div className="rounded-lg border border-slate-200 bg-slate-50/60 p-3">
+  <label className="block text-sm font-medium text-slate-800">
+    Product Other Pictures
+  </label>
+  <p className="mt-1 text-xs text-slate-500">
+    Optional. You can upload up to {MAX_OTHER_IMAGES} images (max 10MB each).
+  </p>
+  <input
+    type="file"
+    accept=".jpg,.jpeg,.png"
+    multiple
+    onChange={(e) => {
+    const newFiles = e.target.files ? Array.from(e.target.files) : [];
+    if (newFiles.length === 0) return;
 
-            // 👉 检查格式（允许 JPG & PNG）
-            const invalidFormat = files.filter(
-                (f) => !ALLOWED_TYPES.includes(f.type)
-            );
+    // 直接用当前的 otherImageFiles 作为“老的”
+    const prevFiles = otherImageFiles;
+    const combined = [...prevFiles, ...newFiles];
 
-            if (invalidFormat.length > 0) {
-                setAddFormError("Only JPG and PNG images are allowed.");
-                e.target.value = "";
-                return;
-            }
+    if (combined.length > MAX_OTHER_IMAGES) {
+        setAddFormError(
+        `You can only upload up to ${MAX_OTHER_IMAGES} images. (Current: ${prevFiles.length}, New: ${newFiles.length})`
+        );
+        e.target.value = "";
+        return;
+    }
 
-            // ✅ 实时验证大小
-            const oversized = files.filter((f) => f.size > MAX_FILE_SIZE);
-            if (oversized.length > 0) {
-                setAddFormError(
-                `${oversized.length} file(s) exceed 10MB. Please select smaller files.`
-                );
-                e.target.value = "";
-                return;
-            }
+    // 只检查本次新增的文件
+    const invalidFormat = newFiles.filter(
+        (f) => !ALLOWED_TYPES.includes(f.type)
+    );
+    if (invalidFormat.length > 0) {
+        setAddFormError("Only JPG and PNG images are allowed.");
+        e.target.value = "";
+        return;
+    }
 
-            setAddFormError(null);
-            setOtherImageFiles(files);
+    const oversized = newFiles.filter((f) => f.size > MAX_FILE_SIZE);
+    if (oversized.length > 0) {
+        setAddFormError(
+        `${oversized.length} file(s) exceed 10MB. Please select smaller files.`
+        );
+        e.target.value = "";
+        return;
+    }
 
-            // 先清理旧的预览 URL
-            otherImagePreviews.forEach((url) => URL.revokeObjectURL(url));
+    // ✅ 一切 OK，生成预览
+    const newPreviews = newFiles.map((f) => URL.createObjectURL(f));
 
-            // 新建预览 URL 列表
-            const previews = files.map((f) => URL.createObjectURL(f));
-            setOtherImagePreviews(previews);
-            }}
-            className="mt-2 w-full cursor-pointer text-sm text-slate-700 file:mr-3 file:cursor-pointer file:rounded-md file:border-0 file:bg-emerald-100 file:px-4 file:py-2 file:text-sm file:font-medium file:text-emerald-700 hover:file:bg-emerald-200"
-            disabled={addSaving}
-        />
+    // 这里就只是纯 setState，不带副作用
+    setOtherImageFiles(combined);
+    setOtherImagePreviews((prev) => [...prev, ...newPreviews]);
+    setAddFormError(null);
 
-  {/* ✅ 显示其他图片缩略图 */}
+    // 允许下次再次选择同一文件
+    e.target.value = "";
+    }}
+    className="mt-2 w-full cursor-pointer text-sm text-slate-700 file:mr-3 file:cursor-pointer file:rounded-md file:border-0 file:bg-emerald-100 file:px-4 file:py-2 file:text-sm file:font-medium file:text-emerald-700 hover:file:bg-emerald-200"
+    disabled={addSaving}
+  />
+
+  {/* ✅ other pictures 缩略图 + 删除按钮 */}
   {otherImagePreviews.length > 0 && (
     <div className="mt-2 grid grid-cols-5 gap-2">
       {otherImagePreviews.map((url, index) => (
-        <img
-          key={index}
-          src={url}
-          alt={`Other product preview ${index + 1}`}
-          className="h-24 w-24 rounded-md border border-slate-200 object-cover"
-        />
+        <div key={index} className="relative h-16 w-16">
+          <img
+            src={url}
+            alt={`Other product preview ${index + 1}`}
+            className="h-16 w-16 rounded-md border border-slate-200 object-cover"
+          />
+          {/* 红色圆圈白色减号 */}
+        <button
+            type="button"
+            onClick={() => handleRemoveOtherImage(index)} 
+           className="absolute -top-2 -right-2 flex h-5 w-5 items-center justify-center rounded-full !bg-red-500 text-xs font-bold text-white shadow"
+        >
+            −
+          </button>
+        </div>
       ))}
     </div>
   )}
 </div>
+
 
         {/* 底部按钮 */}
         <div className="mt-6 flex items-center justify-end gap-2">
