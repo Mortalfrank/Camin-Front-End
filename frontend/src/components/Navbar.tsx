@@ -26,7 +26,7 @@ export default function Navbar() {
             {isAdmin() ? (
               <Link to="/admin">Admin</Link>
             ) : (
-              <Link to="/dashboard">Dashboard</Link>
+              <Link to="/dashboard">My Orders</Link>
             )}
             <Link to="/profile">Profile</Link>
             <Link to="/cart" className="relative flex items-center gap-2">

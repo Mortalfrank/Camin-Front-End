@@ -81,10 +81,11 @@ export default function ProductList() {
                   e.preventDefault();
                   handleAddToCart(product);
                 }}
-                className="w-full bg-blue-600 text-white py-2 rounded hover:bg-blue-700 transition-colors flex items-center justify-center gap-2"
+                className="w-full !bg-white !text-black py-2 rounded border !border-black hover:bg-gray-100 transition-colors flex items-center justify-center gap-2 font-semibold"
+                style={{ color: '#000', backgroundColor: '#fff' }}
               >
-                <CartIcon size={18} />
-                <span>Add to Cart</span>
+                <CartIcon size={18} className="text-black" />
+                <span className="text-black">Add to Cart</span>
               </button>
             </div>
           </div>
@@ -93,4 +94,3 @@ export default function ProductList() {
     </div>
   );
 }
-

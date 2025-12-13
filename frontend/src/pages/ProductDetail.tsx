@@ -115,14 +115,15 @@ export default function ProductDetail() {
           <button
             onClick={handleAddToCart}
             disabled={product.stock === 0}
-            className="w-full bg-blue-600 text-white py-3 rounded hover:bg-blue-700 disabled:bg-gray-400 disabled:cursor-not-allowed transition-colors flex items-center justify-center gap-2"
+            className="w-full !bg-white !text-black py-3 rounded border !border-black hover:bg-gray-100 disabled:bg-gray-300 disabled:cursor-not-allowed transition-colors flex items-center justify-center gap-2 font-semibold"
+            style={{ color: '#000', backgroundColor: '#fff' }}
           >
             {product.stock === 0 ? (
               'Out of Stock'
             ) : (
               <>
-                <CartIcon size={20} />
-                <span>Add to Cart</span>
+                <CartIcon size={20} className="text-black" />
+                <span className="text-black">Add to Cart</span>
               </>
             )}
           </button>
@@ -131,4 +132,3 @@ export default function ProductDetail() {
     </div>
   );
 }
-

@@ -10,12 +10,13 @@ export default function Checkout() {
   const { items, total, clearCart } = useCart();
   const [paymentMethod, setPaymentMethod] = useState<PaymentMethod>('CREDIT_CARD');
   const [loading, setLoading] = useState(false);
+  const [checkoutComplete, setCheckoutComplete] = useState(false);
 
   useEffect(() => {
-    if (items.length === 0) {
+    if (items.length === 0 && !loading && !checkoutComplete) {
       navigate('/cart');
     }
-  }, [items, navigate]);
+  }, [items, loading, checkoutComplete, navigate]);
 
   const handleCheckout = async () => {
     if (items.length === 0) {
@@ -28,6 +29,7 @@ export default function Checkout() {
       const request: CheckoutRequest = { paymentMethod };
       const order = await checkout(request);
       await clearCart();
+      setCheckoutComplete(true);
       navigate(`/receipt/${order.id}`);
     } catch (error: any) {
       alert(error.message || 'Checkout failed');
@@ -88,13 +90,13 @@ export default function Checkout() {
           <button
             onClick={handleCheckout}
             disabled={loading}
-            className="w-full mt-6 bg-blue-600 text-white py-3 rounded hover:bg-blue-700 disabled:bg-gray-400 disabled:cursor-not-allowed transition-colors"
+            className="w-full mt-6 !bg-white !text-black py-3 rounded border !border-black hover:bg-gray-100 disabled:bg-gray-300 disabled:cursor-not-allowed transition-colors font-semibold"
+            style={{ color: '#000', backgroundColor: '#fff' }}
           >
-            {loading ? 'Processing...' : 'Complete Order'}
+            <span className="text-black">{loading ? 'Processing...' : 'Complete Order'}</span>
           </button>
         </div>
       </div>
     </div>
   );
 }
-
