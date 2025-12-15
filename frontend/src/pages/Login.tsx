@@ -63,7 +63,7 @@ export default function Login() {
 
         // USER 账户正常登录
         login(result);
-        navigate('/dashboard');
+        navigate('/orders');
       }
     } catch (err) {
       setError('Login failed, please try again later');

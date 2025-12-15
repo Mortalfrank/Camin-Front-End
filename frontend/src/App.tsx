@@ -10,6 +10,7 @@ import ProductDetail from './pages/ProductDetail';
 import Cart from './pages/Cart';
 import Checkout from './pages/Checkout';
 import Receipt from './pages/Receipt';
+import Orders from './pages/Orders';
 import AdminLogin from './admin/AdminLogin';
 import AdminLayout from './admin/AdminLayout';
 import AdminDashboard from './admin/AdminDashboard';
@@ -45,6 +46,7 @@ function AppLayout() {
           <Route path="/cart" element={<Cart />} />
           <Route path="/checkout" element={<Checkout />} />
           <Route path="/receipt/:orderId" element={<Receipt />} />
+          <Route path="/orders" element={<Orders />} />
 
           <Route path="/profile" element={<Profile />} />
 

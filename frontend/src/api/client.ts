@@ -1,5 +1,6 @@
 // src/api/client.ts
 import { API_BASE_URL } from '../config/env';
+import type { Order, PaymentMethod } from '../types';
 
 // Health Check: Returns plain text
 export async function fetchHealth(): Promise<string> {
@@ -309,16 +310,7 @@ export async function clearCart(): Promise<void> {
 
 // ========== Order API ==========
 export interface CheckoutRequest {
-  paymentMethod: string;
-}
-
-export interface Order {
-  id: number;
-  state: string;
-  totalAmount: number;
-  paymentMethod: string;
-  createdAt: string;
-  items: any[];
+  paymentMethod: PaymentMethod;
 }
 
 export async function checkout(data: CheckoutRequest): Promise<Order> {
