@@ -1,6 +1,9 @@
 import { useEffect, useState } from "react";
+import { useNavigate } from "react-router-dom";
+import { formatOrderState } from "../../utils/formatState"
+import OrderStatusBadge from "../../components/OrderStatusBadge";
 
-type OrderDTO = {
+type OrderSummary = {
   id: number;
   orderNumber: string;
   state: string;
@@ -11,16 +14,19 @@ type OrderDTO = {
 };
 
 export default function AdminOrdersList() {
-  const [orders, setOrders] = useState<OrderDTO[]>([]);
+  const [orders, setOrders] = useState<OrderSummary[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const navigate = useNavigate();
 
   useEffect(() => {
     const load = async () => {
       try {
         setLoading(true);
         setError(null);
-        const res = await fetch("http://localhost:8080/api/admin/orders");
+
+        const API_BASE = import.meta.env.VITE_API_BASE_URL;
+        const res = await fetch(`${API_BASE}/api/admin/orders`);
 
         if (!res.ok) {
           const text = await res.text();
@@ -28,8 +34,6 @@ export default function AdminOrdersList() {
         }
 
         const data = await res.json();
-        console.log("Admin orders data:", data);
-
         if (Array.isArray(data)) {
           setOrders(data);
         } else {
@@ -76,6 +80,7 @@ export default function AdminOrdersList() {
                 <th className="px-4 py-3">Total</th>
                 <th className="px-4 py-3">Payment</th>
                 <th className="px-4 py-3">Created</th>
+                <th className="px-4 py-3 text-right">Actions</th>
               </tr>
             </thead>
 
@@ -85,7 +90,7 @@ export default function AdminOrdersList() {
                   <td className="px-4 py-3 font-medium">
                     {order.orderNumber ?? order.id}
                   </td>
-                  <td className="px-4 py-3">{order.state}</td>
+                  <td className="px-4 py-3"> <OrderStatusBadge state={order.state} /></td>
                   <td className="px-4 py-3">
                     ${Number(order.totalAmount).toFixed(2)}
                   </td>
@@ -94,6 +99,15 @@ export default function AdminOrdersList() {
                     {order.createdAt
                       ? new Date(order.createdAt).toLocaleString()
                       : "-"}
+                  </td>
+                  <td className="px-4 py-3 text-right">
+                    <button
+                      type="button"
+                      onClick={() => navigate(`/admin/orders/${order.id}`)}
+                      className="inline-flex items-center rounded-md border border-slate-300 px-3 py-1 text-xs font-medium text-slate-700 transition hover:bg-slate-100"
+                    >
+                      View
+                    </button>
                   </td>
                 </tr>
               ))}
