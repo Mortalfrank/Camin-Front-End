@@ -6,9 +6,13 @@ export default function AdminSidebar() {
   const [openProducts, setOpenProducts] = useState(
     location.pathname.startsWith("/admin/products")
   );
+  const [openOrders, setOpenOrders] = useState(
+    location.pathname.startsWith("/admin/orders")
+  );
   const [openAnalytics, setOpenAnalytics] = useState(
     location.pathname.startsWith("/admin/analytics")
   );
+  
 
   return (
     <aside className="flex w-60 flex-col bg-slate-200 text-black-950">
@@ -51,6 +55,34 @@ export default function AdminSidebar() {
             to="/admin/products/list"
             className={`block rounded-md px-3 py-2 text-sm no-underline transition hover:bg-slate-100 ${
               location.pathname.includes("/admin/products/list")
+                ? "bg-slate-100 font-semibold"
+                : ""
+            }`}
+          >
+            List
+          </Link>
+        </div>
+        {/* Orders */}
+        <button
+          type="button"
+          onClick={() => setOpenOrders(!openOrders)}
+          className="flex w-full items-center justify-between rounded-md px-3 py-2 text-left text-sm !font-normal
+            transition hover:bg-slate-100 !bg-slate-200"
+        >
+          <span>Orders</span>
+          <span className="text-xs">{openOrders ? "▾" : "▸"}</span>
+        </button>
+        
+        {/* Orders Submenu */}
+        <div
+          className={`ml-6 space-y-1 overflow-hidden transition-all duration-200 ${
+            openOrders ? "max-h-40 opacity-100" : "max-h-0 opacity-0"
+          }`}
+        >
+          <Link
+            to="/admin/orders/list"
+            className={`block rounded-md px-3 py-2 text-sm no-underline transition hover:bg-slate-100 ${
+              location.pathname.includes("/admin/orders/list")
                 ? "bg-slate-100 font-semibold"
                 : ""
             }`}

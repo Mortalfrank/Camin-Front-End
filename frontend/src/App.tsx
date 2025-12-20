@@ -14,6 +14,7 @@ import AdminLogin from './admin/AdminLogin';
 import AdminLayout from './admin/AdminLayout';
 import AdminDashboard from './admin/AdminDashboard';
 import ProductsList from './admin/products/ProductList';
+import AdminOrdersList from './admin/orders/AdminOrdersList';
 import SalesAnalytics from './admin/analytics/SalesAnalytics';
 import ProductAnalytics from './admin/analytics/ProductAnalytics';
 import CustomerAnalytics from './admin/analytics/CustomerAnalytics';
@@ -54,6 +55,7 @@ function AppLayout() {
           {/* Admin Layout wraps all background pages */}
           <Route path="/admin" element={<AdminLayout />}>
             <Route index element={<AdminDashboard />} />
+            <Route path="orders/list" element = {<AdminOrdersList />} />
             <Route path="products/list" element={<ProductsList />} />
             <Route path="analytics/sales" element={<SalesAnalytics />} />
             <Route path="analytics/products" element={<ProductAnalytics />} />
