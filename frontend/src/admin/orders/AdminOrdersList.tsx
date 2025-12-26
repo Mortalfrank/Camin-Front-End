@@ -1,10 +1,18 @@
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { formatOrderState } from "../../utils/formatState"
 import OrderStatusBadge from "../../components/OrderStatusBadge";
 
+
+type User = {
+    id: number;
+    username?: string;
+    email?: string;
+}
+
 type OrderSummary = {
   id: number;
+  user: User;
   orderNumber: string;
   state: string;
   totalAmount: number;
@@ -17,6 +25,7 @@ export default function AdminOrdersList() {
   const [orders, setOrders] = useState<OrderSummary[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [query, setQuery] = useState("");
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -50,6 +59,18 @@ export default function AdminOrdersList() {
     load();
   }, []);
 
+    // Search Function
+    const filteredOrders = useMemo(() => {
+        const q = query.trim().toLowerCase();
+        if(!q) return orders;
+
+        return orders.filter((o) => {
+            const orderNo = String(o.orderNumber ?? "").toLowerCase();
+            const username = String(o.user.username ?? "").toLowerCase();
+            return orderNo.includes(q) || username.includes(q);
+        });
+    }, [orders, query]);
+
   if (loading) {
     return <div className="text-lg font-medium">Loading orders...</div>;
   }
@@ -65,7 +86,32 @@ export default function AdminOrdersList() {
   return (
     <div>
       <h1 className="mb-6 text-2xl font-semibold tracking-tight">Orders</h1>
+        {/* Search Bar */}
+        <div className="mb-4 flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
+            <div className="flex w-full items-center gap-2 sm:max-w-md">
+            <input
+                value={query}
+                onChange={(e) => setQuery(e.target.value)}
+                placeholder="Search by username or order number..."
+                className="w-full rounded-md border border-slate-300 bg-white px-3 py-2 text-sm outline-none focus:border-slate-400"
+            />
+            {query.trim() && (
+                <button
+                type="button"
+                onClick={() => setQuery("")}
+                className="inline-flex items-center rounded-md border border-slate-300 bg-white px-3 py-2 text-sm text-slate-700 hover:bg-slate-50"
+                >
+                Clear
+                </button>
+            )}
+            </div>
 
+            {/* Resultes Number */}
+            <div className="text-sm text-slate-500">
+            Showing <span className="font-medium text-slate-700">{filteredOrders.length}</span>{" "}
+            of <span className="font-medium text-slate-700">{orders.length}</span>
+            </div>
+        </div>
       {orders.length === 0 ? (
         <div className="rounded-md border border-slate-200 bg-white p-4 text-sm text-slate-500">
           No orders found in database.
@@ -80,12 +126,13 @@ export default function AdminOrdersList() {
                 <th className="px-4 py-3">Total</th>
                 <th className="px-4 py-3">Payment</th>
                 <th className="px-4 py-3">Created</th>
+                <th className="px-4 py-3">Username</th>
                 <th className="px-4 py-3 text-right">Actions</th>
               </tr>
             </thead>
 
             <tbody className="divide-y divide-slate-200">
-              {orders.map((order) => (
+              {filteredOrders.map((order) => (
                 <tr key={order.id} className="hover:bg-slate-50">
                   <td className="px-4 py-3 font-medium">
                     {order.orderNumber ?? order.id}
@@ -100,6 +147,7 @@ export default function AdminOrdersList() {
                       ? new Date(order.createdAt).toLocaleString()
                       : "-"}
                   </td>
+                  <td className="px-4 py-3">{order.user.username}</td>
                   <td className="px-4 py-3 text-right">
                     <button
                       type="button"
