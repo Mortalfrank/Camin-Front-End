@@ -108,7 +108,9 @@ export default function Orders() {
           >
             <div className="flex flex-col gap-3 border-b border-gray-100 px-4 py-3 md:flex-row md:items-center md:justify-between">
               <div>
-                <p className="text-sm text-gray-500">Order #{order.id}</p>
+                <p className="text-sm text-gray-500">
+                  Order #{order.id}{order.orderNumber ? ` · ${order.orderNumber}` : ''}
+                </p>
                 <p className="text-sm text-gray-500">
                   Placed on {new Date(order.createdAt).toLocaleString()}
                 </p>

@@ -311,6 +311,10 @@ export async function clearCart(): Promise<void> {
 // ========== Order API ==========
 export interface CheckoutRequest {
   paymentMethod: PaymentMethod;
+  deliveryAddress: string;
+  recipientName: string;
+  recipientPhoneNumber: string;
+  receiptEmail: string;
 }
 
 export async function checkout(data: CheckoutRequest): Promise<Order> {

@@ -50,9 +50,27 @@ export default function Receipt() {
         <h2 className="text-2xl font-bold mb-4">Order Details</h2>
         <div className="space-y-2 mb-4">
           <p><span className="font-semibold">Order ID:</span> #{order.id}</p>
+          {order.orderNumber && (
+            <p><span className="font-semibold">Order Number:</span> {order.orderNumber}</p>
+          )}
           <p><span className="font-semibold">Status:</span> {order.state}</p>
           <p><span className="font-semibold">Payment Method:</span> {order.paymentMethod}</p>
           <p><span className="font-semibold">Date:</span> {new Date(order.createdAt).toLocaleString()}</p>
+          {order.arrivedAt && (
+            <p><span className="font-semibold">Arrived At:</span> {new Date(order.arrivedAt).toLocaleString()}</p>
+          )}
+          {order.deliveryAddress && (
+            <p><span className="font-semibold">Delivery Address:</span> {order.deliveryAddress}</p>
+          )}
+          {order.recipientName && (
+            <p><span className="font-semibold">Recipient:</span> {order.recipientName}</p>
+          )}
+          {order.recipientPhoneNumber && (
+            <p><span className="font-semibold">Phone:</span> {order.recipientPhoneNumber}</p>
+          )}
+          {order.receiptEmail && (
+            <p><span className="font-semibold">Receipt Email:</span> {order.receiptEmail}</p>
+          )}
         </div>
 
         <div className="border-t pt-4 mt-4">
@@ -93,4 +111,3 @@ export default function Receipt() {
     </div>
   );
 }
-

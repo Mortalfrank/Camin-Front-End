@@ -29,12 +29,17 @@ export type OrderItem = {
 
 export type Order = {
   id: number;
+  orderNumber?: string;
   state: 'PENDING' | 'PAID' | 'CANCELLED' | 'TRANSPORTING' | 'ARRIVED' | 'ACCEPTED' | 'RETURNED';
   totalAmount: number;
   paymentMethod: string;
   createdAt: string;
+  arrivedAt?: string | null;
+  deliveryAddress?: string;
+  recipientName?: string;
+  recipientPhoneNumber?: string;
+  receiptEmail?: string;
   items: OrderItem[];
 };
 
 export type PaymentMethod = 'CREDIT_CARD' | 'DEBIT_CARD' | 'PAYPAL' | 'BANK_TRANSFER' | 'CASH';
-
