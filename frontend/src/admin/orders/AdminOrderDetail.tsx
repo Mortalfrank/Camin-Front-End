@@ -10,6 +10,12 @@ type ProductInfo = {
   model?: string;
 };
 
+type User = {
+    id: number;
+    email?: string;
+    username?: string;
+
+}
 type OrderItem = {
   id: number;
   quantity: number;
@@ -20,6 +26,7 @@ type OrderItem = {
 
 type OrderDetail = {
   id: number;
+  user: User| null;
   orderNumber: string;
   state: string;
   totalAmount: number;
@@ -136,6 +143,23 @@ export default function AdminOrderDetail() {
         </div>
 
         <div className="space-y-2 text-sm">
+            <div>
+                <span className="font-semibold text-slate-700">Customer: </span>
+                <span>
+                    {order.user
+                    ? (order.user.username || order.user.email || `User #${order.user.id}`)
+                    : <span className="text-slate-400 italic">Guest / Unknown</span>
+                    }
+                </span>
+            </div>
+
+            <div>
+                <span className="font-semibold text-slate-700">Email: </span>
+                <span>
+                    {order.user?.email || "-"}
+                </span>
+            </div>
+
           <div>
             <span className="font-semibold text-slate-700">Created At: </span>
             <span>
