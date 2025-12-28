@@ -112,7 +112,7 @@ export default function AdminOrdersList() {
             of <span className="font-medium text-slate-700">{orders.length}</span>
             </div>
         </div>
-      {orders.length === 0 ? (
+      {filteredOrders.length === 0 ? (
         <div className="rounded-md border border-slate-200 bg-white p-4 text-sm text-slate-500">
           No orders found in database.
         </div>
