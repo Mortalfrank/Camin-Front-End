@@ -13,8 +13,12 @@ export default function ProductsList() {
     const [products, setProducts] = useState<Product[]>([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState<string | null>(null);
-
     const [editingProduct, setEditingProduct] = useState<Product | null>(null);
+
+    // A Maximum of 10 products are diaplayed per page list 
+    const PAGE_SIZE = 10;
+    const [page, setPage] = useState(1);
+    const [total, setTotal] = useState(0);
 
     // Control the Add pop-up window
     const [isAddModalOpen, setIsAddModalOpen] = useState(false);
@@ -33,28 +37,39 @@ export default function ProductsList() {
     const canEdit = selectedCount === 1;
     const canDelete = selectedCount >= 1;
 
-    useEffect(() => {
-        const fetchProducts = async () => {
-        try {
-            setLoading(true);
-            setError(null);
+    const fetchProducts = async () => {
+            try {
+                setLoading(true);
+                setError(null);
 
-            const res = await fetch("http://localhost:8080/api/products");
-            if (!res.ok) {
-                throw new Error(`Failed to load products: ${res.status}`);
+                const params = new URLSearchParams({
+                    page: String(page),
+                    pageSize: String(PAGE_SIZE),
+                });
+
+                const res = await fetch(
+                    `http://localhost:8080/api/products?${params.toString()}`
+                );
+
+                if (!res.ok) {
+                    throw new Error(`Failed to load products: ${res.status}`);
+                }
+
+                const data = await res.json();
+
+                setProducts(data.content);
+                setTotal(data.totalElements);
+            } catch (err: any) {
+                console.error(err);
+                setError(err.message || "Failed to load products");
+            } finally {
+                setLoading(false);
             }
-            const data: Product[] = await res.json();
-            setProducts(data);
-        } catch (err: any) {
-            console.error(err);
-            setError(err.message || "Failed to load products");
-        } finally {
-            setLoading(false);
-        }
         };
 
+    useEffect(() => {
         fetchProducts();
-    }, []);
+    }, [page]);
 
     /** Open Add pop-up window */
     const handleOpenAddModal = () => {
@@ -76,7 +91,7 @@ export default function ProductsList() {
 
     /** Successful Uploaded, Update List + pop Toast */
     const handleAddSuccess = (created: Product) => {
-        setProducts((prev) => [created, ...prev]);
+        fetchProducts();
         showToast("Successfully added product.", "success");
     };
 
@@ -126,21 +141,26 @@ export default function ProductsList() {
         .map(([id]) => Number(id));
 
         try {
-            for (const id of selectedIds) {
+            await Promise.all(
+            selectedIds.map(async (id) => {
                 const res = await fetch(`http://localhost:8080/api/products/${id}`, {
-                    method: "DELETE",
+                method: "DELETE",
                 });
 
-                // 后端返回 204 或 200 都算成功，其他状态算失败
-                if (!res.ok && res.status !== 204) {
-                    throw new Error(
-                        `Failed to delete product id=${id}, status=${res.status}`
-                    );
-                }   
-            }
+                if (!(res.status === 204 || res.ok)) {
+                throw new Error(`Failed to delete product id=${id}, status=${res.status}`);
+                }
+            })
+            );
+            
+            const remaining = total - selectedIds.length;
+            const lastPage = Math.max(1, Math.ceil(remaining / PAGE_SIZE));
 
-            // Remove the corresponding prodcut from the Front-end list 
-            setProducts((prev) => prev.filter((p) => !selectedIds.includes(p.id)));
+            if (page > lastPage){
+                setPage(lastPage);
+            }else{
+                await fetchProducts();
+            }
 
             // Clear up selection state
             setSelectedRows({});
@@ -157,6 +177,7 @@ export default function ProductsList() {
             setIsDeleteConfirmOpen(false);
         }
     };
+
 
     /** Click "Cancel" on the confirmation pop-up window */
     const handleCancelDelete = () => {
@@ -354,6 +375,30 @@ export default function ProductsList() {
                             ))}
                         </tbody>
                     </table>
+                    <div className="mt-4 flex items-center justify-between">
+                        <button
+                            type="button"
+                            disabled={page === 1}
+                            onClick={() => setPage((p) => p - 1)}
+                            className="rounded-md border px-3 py-2 text-sm disabled:opacity-50"
+                        >
+                            Prev
+                        </button>
+
+                        <div className="text-sm text-slate-500">
+                            Page {page} / {Math.max(1, Math.ceil(total / PAGE_SIZE))}
+                        </div>
+
+                        <button
+                            type="button"
+                            disabled={page >= Math.ceil(total / PAGE_SIZE)}
+                            onClick={() => setPage((p) => p + 1)}
+                            className="rounded-md border px-3 py-2 text-sm disabled:opacity-50"
+                        >
+                            Next
+                        </button>
+                    </div>
+
                 </div>
             </div>
 
