@@ -15,6 +15,14 @@ export default function ProductsList() {
     const [error, setError] = useState<string | null>(null);
     const [editingProduct, setEditingProduct] = useState<Product | null>(null);
 
+    //Search UI (input state)
+    const [keywordInput, setKeywordInput] = useState("");
+    const [typeInput, setTypeInput] = useState<"NAME" | "SERIES" | "BRAND">("NAME");
+    
+    //Search params actually sent to backen (committed state)
+    const [keyword, setKeyword] = useState("");
+    const [type, setType] = useState <"NAME" | "SERIES" | "BRAND">("NAME");
+
     // A Maximum of 10 products are diaplayed per page list 
     const PAGE_SIZE = 10;
     const [page, setPage] = useState(1);
@@ -38,6 +46,7 @@ export default function ProductsList() {
     const canDelete = selectedCount >= 1;
 
     const fetchProducts = async () => {
+
             try {
                 setLoading(true);
                 setError(null);
@@ -46,7 +55,11 @@ export default function ProductsList() {
                     page: String(page),
                     pageSize: String(PAGE_SIZE),
                 });
-
+                
+                if (keyword.trim()) {
+                    params.set("q", keyword.trim());
+                    params.set("type", type);
+                }
                 const res = await fetch(
                     `http://localhost:8080/api/products?${params.toString()}`
                 );
@@ -69,7 +82,7 @@ export default function ProductsList() {
 
     useEffect(() => {
         fetchProducts();
-    }, [page]);
+    }, [page, keyword, type]);
 
     /** Open Add pop-up window */
     const handleOpenAddModal = () => {
@@ -89,6 +102,26 @@ export default function ProductsList() {
         }, 3000);
     };
 
+    /** Search Fucntion */
+    const handleSearchClick = () =>{
+        setPage(1);
+        setKeyword(keywordInput);
+        setType(typeInput);
+
+        setSelectedRows({});
+        setSelectedAll(false);
+    }
+
+    const handleClearSearch = () =>{
+        setKeywordInput("");
+        setTypeInput("NAME");
+        setPage(1);
+        setKeyword("");
+        setType("NAME");
+
+        setSelectedRows({});
+        setSelectedAll(false);
+    }
     /** Successful Uploaded, Update List + pop Toast */
     const handleAddSuccess = (created: Product) => {
         fetchProducts();
@@ -195,12 +228,61 @@ export default function ProductsList() {
             <div className="rounded-xl bg-white p-4 shadow-sm">
                 <div className="mb-4 flex flex-col gap-3 md:flex-row md:items-center md:justify-between">
                     {/* Search bar */}
-                    <div className="relative w-full max-w-md">
-                        <input
-                        type="text"
-                        placeholder="Search products..."
-                        className="w-full rounded-full border border-slate-300 px-4 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-emerald-400"
-                        />
+                    <div className="flex w-full flex-col gap-2 sm:flex-row sm:items-center md:flex-1 md:max-w-2xl">
+                        <div className="relative flex-1">
+                            <input
+                            type="text"
+                            value={keywordInput}
+                            onChange={(e) => setKeywordInput(e.target.value)}
+                            placeholder="Search products..."
+                            className="w-full rounded-full border border-slate-300 bg-white px-4 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-emerald-400"
+                            />
+                        </div>
+
+                        <div className="relative">
+                            <select
+                                value={typeInput}
+                                onChange={(e) => setTypeInput(e.target.value as any)}
+                                className="h-10 appearance-none rounded-full border border-slate-300 bg-white pl-4 pr-10 text-sm text-slate-700 shadow-sm outline-none focus:ring-2 focus:ring-emerald-400"
+                            >
+                                <option value="NAME">Name</option>
+                                <option value="SERIES">Series</option>
+                                <option value="BRAND">Brand</option>
+                            </select>
+
+                            {/* dropdown arrow */}
+                            <svg
+                                className="pointer-events-none absolute right-3 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-500"
+                                viewBox="0 0 20 20"
+                                fill="currentColor"
+                                aria-hidden="true"
+                            >
+                                <path
+                                fillRule="evenodd"
+                                d="M5.23 7.21a.75.75 0 011.06.02L10 10.94l3.71-3.71a.75.75 0 111.06 1.06l-4.24 4.24a.75.75 0 01-1.06 0L5.21 8.29a.75.75 0 01.02-1.08z"
+                                clipRule="evenodd"
+                                />
+                            </svg>
+                        </div>
+
+
+                        <button
+                            type="button"
+                            onClick={handleSearchClick}
+                            className="rounded-full bg-emerald-600 px-4 py-2 text-sm font-medium text-black shadow-sm transition hover:bg-emerald-700"
+                        >
+                            Search
+                        </button>
+
+                        {(keyword || keywordInput) && (
+                            <button
+                            type="button"
+                            onClick={handleClearSearch}
+                            className="rounded-full border border-slate-300 bg-white px-4 py-2 text-sm font-medium text-slate-700 shadow-sm transition hover:bg-slate-100"
+                            >
+                            Clear
+                            </button>
+                        )}
                     </div>
 
                     {/* Button Area */}
@@ -307,7 +389,9 @@ export default function ProductsList() {
                                     className="px-3 py-3 text-sm text-slate-500"
                                     colSpan={8}
                                 >
-                                    No products found.
+                                    {keyword
+                                    ?` No products found for "${keyword}" in ${type}.`
+                                    : "No products found."}
                                 </td>
                                 </tr>
                             )}
