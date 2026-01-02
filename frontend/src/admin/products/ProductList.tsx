@@ -265,24 +265,25 @@ export default function ProductsList() {
                             </svg>
                         </div>
 
-
-                        <button
-                            type="button"
-                            onClick={handleSearchClick}
-                            className="rounded-full bg-emerald-600 px-4 py-2 text-sm font-medium text-black shadow-sm transition hover:bg-emerald-700"
-                        >
-                            Search
-                        </button>
-
-                        {(keyword || keywordInput) && (
+                        <div className="flex flex-wrap gap-2 md:flex-shrink-0">
                             <button
-                            type="button"
-                            onClick={handleClearSearch}
-                            className="rounded-full border border-slate-300 bg-white px-4 py-2 text-sm font-medium text-slate-700 shadow-sm transition hover:bg-slate-100"
+                                type="button"
+                                onClick={handleSearchClick}
+                                className="rounded-full bg-emerald-600 px-4 py-2 text-sm font-medium text-black shadow-sm transition hover:bg-emerald-700"
                             >
-                            Clear
+                                Search
                             </button>
-                        )}
+
+                            {(keyword || keywordInput) && (
+                                <button
+                                type="button"
+                                onClick={handleClearSearch}
+                                className="rounded-full border border-slate-300 bg-white px-4 py-2 text-sm font-medium text-slate-700 shadow-sm transition hover:bg-slate-100"
+                                >
+                                Clear
+                                </button>
+                            )}
+                        </div>
                     </div>
 
                     {/* Button Area */}

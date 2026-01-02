@@ -12,7 +12,7 @@ type User = {
 
 type OrderSummary = {
   id: number;
-  user: User;
+  user?: User | null;
   orderNumber: string;
   state: string;
   totalAmount: number;
@@ -66,7 +66,7 @@ export default function AdminOrdersList() {
 
         return orders.filter((o) => {
             const orderNo = String(o.orderNumber ?? "").toLowerCase();
-            const username = String(o.user.username ?? "").toLowerCase();
+            const username = String(o.user?.username ?? "").toLowerCase();
             return orderNo.includes(q) || username.includes(q);
         });
     }, [orders, query]);
@@ -147,7 +147,7 @@ export default function AdminOrdersList() {
                       ? new Date(order.createdAt).toLocaleString()
                       : "-"}
                   </td>
-                  <td className="px-4 py-3">{order.user.username}</td>
+                  <td className="px-4 py-3">{order.user?.username ?? "Guest"}</td>
                   <td className="px-4 py-3 text-right">
                     <button
                       type="button"
