@@ -22,54 +22,55 @@ type OrderSummary = {
 };
 
 export default function AdminOrdersList() {
-  const [orders, setOrders] = useState<OrderSummary[]>([]);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
-  const [query, setQuery] = useState("");
-  const navigate = useNavigate();
+    const [orders, setOrders] = useState<OrderSummary[]>([]);
+    const [loading, setLoading] = useState(true);
+    const [error, setError] = useState<string | null>(null);
+    const [queryInput, setQueryInput] = useState("");
+    const [query, setQuery] = useState("");
+    const navigate = useNavigate();
 
-  useEffect(() => {
-    const load = async () => {
-      try {
-        setLoading(true);
-        setError(null);
+    const PAGE_SIZE = 10;
+    const [page, setPage] = useState(1);
+    const [total, setTotal] = useState(0);
 
-        const API_BASE = import.meta.env.VITE_API_BASE_URL;
-        const res = await fetch(`${API_BASE}/api/admin/orders`);
+    const totalPages = Math.max(1, Math.ceil(total / PAGE_SIZE));
+    const canPrev = page > 1;
+    const canNext = page < totalPages;
 
-        if (!res.ok) {
-          const text = await res.text();
-          throw new Error(`HTTP ${res.status}: ${text}`);
+    useEffect(() => {
+        const load = async () => {
+        try {
+            setLoading(true);
+            setError(null);
+
+            const API_BASE = import.meta.env.VITE_API_BASE_URL;
+
+            const params = new URLSearchParams({
+                page: String(page),
+                pageSize: String(PAGE_SIZE),
+            });
+            if (query.trim()) params.set("q", query.trim());
+
+            const res = await fetch(`${API_BASE}/api/admin/orders?${params.toString()}`);
+
+            if (!res.ok) {
+            const text = await res.text();
+            throw new Error(`HTTP ${res.status}: ${text}`);
+            }
+
+            const data = await res.json();
+           setOrders(Array.isArray(data.content) ? data.content : []);
+           setTotal(typeof data.totalElements === "number" ? data.totalElements : 0);
+        } catch (err: any) {
+            console.error("Failed to load admin orders:", err);
+            setError(err.message ?? "Failed to load orders.");
+        } finally {
+            setLoading(false);
         }
+        };
 
-        const data = await res.json();
-        if (Array.isArray(data)) {
-          setOrders(data);
-        } else {
-          setError("Unexpected data format from server.");
-        }
-      } catch (err: any) {
-        console.error("Failed to load admin orders:", err);
-        setError(err.message ?? "Failed to load orders.");
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    load();
-  }, []);
-
-    // Search Function
-    const filteredOrders = useMemo(() => {
-        const q = query.trim().toLowerCase();
-        if(!q) return orders;
-
-        return orders.filter((o) => {
-            const orderNo = String(o.orderNumber ?? "").toLowerCase();
-            const username = String(o.user?.username ?? "").toLowerCase();
-            return orderNo.includes(q) || username.includes(q);
-        });
-    }, [orders, query]);
+        load();
+    }, [page, query]);
 
   if (loading) {
     return <div className="text-lg font-medium">Loading orders...</div>;
@@ -90,29 +91,42 @@ export default function AdminOrdersList() {
         <div className="mb-4 flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
             <div className="flex w-full items-center gap-2 sm:max-w-md">
             <input
-                value={query}
-                onChange={(e) => setQuery(e.target.value)}
+                value={queryInput}
+                onChange={(e) => setQueryInput(e.target.value)}
                 placeholder="Search by username or order number..."
                 className="w-full rounded-md border border-slate-300 bg-white px-3 py-2 text-sm outline-none focus:border-slate-400"
             />
-            {query.trim() && (
-                <button
+            <button
                 type="button"
-                onClick={() => setQuery("")}
-                className="inline-flex items-center rounded-md border border-slate-300 bg-white px-3 py-2 text-sm text-slate-700 hover:bg-slate-50"
+                onClick={() => {
+                    setPage(1);
+                    setQuery(queryInput.trim());
+                }}
+            >
+                Search
+            </button>
+            {query.trim() && (
+                 
+                <button
+                    type="button"
+                    onClick={() => {
+                        setQueryInput("");
+                        setQuery("");
+                        setPage(1);
+                    }}
                 >
-                Clear
+                    Clear
                 </button>
             )}
             </div>
 
             {/* Resultes Number */}
             <div className="text-sm text-slate-500">
-            Showing <span className="font-medium text-slate-700">{filteredOrders.length}</span>{" "}
-            of <span className="font-medium text-slate-700">{orders.length}</span>
+                Showing <span className="font-medium text-slate-700">{orders.length}</span> of{" "}
+                <span className="font-medium text-slate-700">{total}</span>
             </div>
         </div>
-      {filteredOrders.length === 0 ? (
+      {orders.length === 0 ? (
         <div className="rounded-md border border-slate-200 bg-white p-4 text-sm text-slate-500">
           No orders found in database.
         </div>
@@ -132,7 +146,7 @@ export default function AdminOrdersList() {
             </thead>
 
             <tbody className="divide-y divide-slate-200">
-              {filteredOrders.map((order) => (
+              {orders.map((order) => (
                 <tr key={order.id} className="hover:bg-slate-50">
                   <td className="px-4 py-3 font-medium">
                     {order.orderNumber ?? order.id}
@@ -161,8 +175,34 @@ export default function AdminOrdersList() {
               ))}
             </tbody>
           </table>
+          <div className="flex items-center justify-between bg-white px-4 py-3">
+                <button
+                    type="button"
+                    disabled={!canPrev}
+                    onClick={() => setPage((p) => p - 1)}
+                    className="rounded-md border border-slate-300 bg-white px-3 py-2 text-sm text-slate-700 disabled:cursor-not-allowed disabled:opacity-50"
+                >
+                    Prev
+                </button>
+
+                <div className="text-sm text-slate-500">
+                    Page <span className="font-medium text-slate-700">{page}</span> /{" "}
+                    <span className="font-medium text-slate-700">{totalPages}</span>
+                </div>
+
+                <button
+                    type="button"
+                    disabled={!canNext}
+                    onClick={() => setPage((p) => p + 1)}
+                    className="rounded-md border border-slate-300 bg-white px-3 py-2 text-sm text-slate-700 disabled:cursor-not-allowed disabled:opacity-50"
+                >
+                    Next
+                </button>
+            </div>
+
         </div>
       )}
+      
     </div>
   );
 }
