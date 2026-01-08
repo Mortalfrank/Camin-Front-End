@@ -176,10 +176,11 @@ export default function SignUpForm() {
             required
           />
         </div>
-
-        <button type="submit" disabled={loading}>
-          {loading ? 'Registering...' : 'Register'}
-        </button>
+        <div className="signup-form">
+          <button type="submit" disabled={loading}>
+            {loading ? 'Registering...' : 'Register'}
+          </button>
+        </div>
       </form>
 
       {message && <p className="success-message">{message}</p>}

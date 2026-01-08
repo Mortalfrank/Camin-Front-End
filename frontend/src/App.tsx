@@ -15,6 +15,7 @@ import AdminLogin from './admin/AdminLogin';
 import AdminLayout from './admin/AdminLayout';
 import AdminDashboard from './admin/AdminDashboard';
 import ProductsList from './admin/products/ProductList';
+import ProductStock from './admin/products/ProductStock';
 import AdminOrdersList from './admin/orders/AdminOrdersList';
 import AdminOrderDetail from './admin/orders/AdminOrderDetail';
 import SalesAnalytics from './admin/analytics/SalesAnalytics';
@@ -61,6 +62,7 @@ function AppLayout() {
             <Route path="orders/list" element = {<AdminOrdersList />} />
             <Route path="orders/:orderId" element = {<AdminOrderDetail />} />
             <Route path="products/list" element = {<ProductsList />} />
+            <Route path="products/stock" element = {<ProductStock />}/>
             <Route path="analytics/sales" element = {<SalesAnalytics />} />
             <Route path="analytics/products" element = {<ProductAnalytics />} />
             <Route path="analytics/customers" element = {<CustomerAnalytics />} />

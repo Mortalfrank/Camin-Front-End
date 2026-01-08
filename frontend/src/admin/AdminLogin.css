@@ -65,7 +65,7 @@
   margin-top: 4px;
 }
 
-button[type="submit"] {
+.admin-login button[type="submit"] {
   width: 100%;
   padding: 12px;
   background: #2563eb;
@@ -77,11 +77,11 @@ button[type="submit"] {
   transition: 0.2s;
 }
 
-button[type="submit"]:hover {
+.admin-login button[type="submit"]:hover {
   background: #1d4ed8;
 }
 
-button[type="submit"]:disabled {
+.admin-login button[type="submit"]:disabled {
   opacity: 0.6;
   cursor: not-allowed;
 }

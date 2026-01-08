@@ -221,7 +221,7 @@ export default function ProductsList() {
         <div className="space-y-4">
             {/* Page Title */}
             <div>
-                <h2 className="text-2xl font-semibold">Product List</h2>
+                <h1 className="text-2xl font-semibold">Product List</h1>
                 <p className="text-sm text-slate-500">Manage your products here.</p>
             </div>
 

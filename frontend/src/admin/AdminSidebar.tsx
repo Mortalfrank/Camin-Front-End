@@ -61,6 +61,16 @@ export default function AdminSidebar() {
           >
             List
           </Link>
+          <Link
+            to="/admin/products/stock"
+            className={`block rounded-md px-3 py-2 text-sm no-underline transition hover:bg-slate-100 ${
+              location.pathname.includes("/admin/products/stock")
+                ? "bg-slate-100 font-semibold"
+                : ""
+            }`}
+          >
+            Stock
+          </Link>
         </div>
         {/* Orders */}
         <button

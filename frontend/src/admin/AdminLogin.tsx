@@ -99,10 +99,11 @@ export default function AdminLogin() {
                 <p className="field-error">{errors.password}</p>
             )}
             </div>
-
-            <button type="submit" disabled={loading}>
-            {loading ? 'Logging in…' : 'Login'}
-            </button>
+            <div className="admin-login">
+              <button type="submit" disabled={loading}>
+              {loading ? 'Logging in…' : 'Login'}
+              </button>
+            </div>
         </form>
         </div>
     </div>
