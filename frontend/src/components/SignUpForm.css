@@ -82,3 +82,21 @@
   background: #ffebee;
   border-radius: 4px;
 }
+
+.field-error {
+  color: #f44336;
+  font-size: 12px;
+  margin-top: 4px;
+  display: block;
+}
+
+.hint {
+  color: #666;
+  font-size: 12px;
+  margin-top: 4px;
+  display: block;
+}
+
+.form-group input.error {
+  border-color: #f44336;
+}
