@@ -1,5 +1,6 @@
-import { useState } from 'react';
-import { signUpWithEmail, signUpWithPhone } from '../api/client';
+// src/components/SignUpForm.tsx
+import { useState, useEffect } from 'react';
+import { signUpWithEmail, signUpWithPhone, sendVerificationCode } from '../api/client';
 import { 
   validateEmail, 
   validatePhoneNumber, 
@@ -18,22 +19,33 @@ export default function SignUpForm() {
     username: '',
     gender: 'OTHER',
     dob: '',
+    verificationCode: '',
   });
   
   const [loading, setLoading] = useState(false);
   const [message, setMessage] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [fieldErrors, setFieldErrors] = useState<Record<string, string>>({});
+  
+  // 验证码相关状态
+  const [codeSending, setCodeSending] = useState(false);
+  const [countdown, setCountdown] = useState(0);
+  const [codeSent, setCodeSent] = useState(false);
+
+  // 倒计时
+  useEffect(() => {
+    if (countdown > 0) {
+      const timer = setTimeout(() => setCountdown(countdown - 1), 1000);
+      return () => clearTimeout(timer);
+    }
+  }, [countdown]);
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
     const { name, value } = e.target;
     setFormData(prev => ({ ...prev, [name]: value }));
-    
-    // 清除该字段的错误
     setFieldErrors(prev => ({ ...prev, [name]: '' }));
   };
 
-  // 实时验证
   const handleBlur = (e: React.FocusEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
     let result;
@@ -60,22 +72,49 @@ export default function SignUpForm() {
     }
   };
 
+  // 发送验证码
+  const handleSendCode = async () => {
+    // 先验证手机号
+    const phoneResult = validatePhoneNumber(formData.phoneNumber);
+    if (!phoneResult.isValid) {
+      setFieldErrors(prev => ({ ...prev, phoneNumber: phoneResult.error || '' }));
+      return;
+    }
+
+    setCodeSending(true);
+    setError(null);
+
+    try {
+      const result = await sendVerificationCode({ phoneNumber: formData.phoneNumber });
+      
+      if (result.error) {
+        setError(result.error);
+      } else {
+        setCodeSent(true);
+        setCountdown(60); // 60秒倒计时
+        setMessage('Verification code sent! Check your phone (or console in dev mode)');
+      }
+    } catch (err) {
+      setError('Failed to send verification code');
+      console.error(err);
+    } finally {
+      setCodeSending(false);
+    }
+  };
+
   const validateForm = (): boolean => {
     const errors: Record<string, string> = {};
 
-    // 验证用户名
     const usernameResult = validateUsername(formData.username);
     if (!usernameResult.isValid) {
       errors.username = usernameResult.error || '';
     }
 
-    // 验证密码
     const passwordResult = validatePassword(formData.password);
     if (!passwordResult.isValid) {
       errors.password = passwordResult.error || '';
     }
 
-    // 根据注册方式验证
     if (signUpMethod === 'email') {
       const emailResult = validateEmail(formData.email);
       if (!emailResult.isValid) {
@@ -86,9 +125,12 @@ export default function SignUpForm() {
       if (!phoneResult.isValid) {
         errors.phoneNumber = phoneResult.error || '';
       }
+      // 验证验证码
+      if (!formData.verificationCode || formData.verificationCode.length !== 6) {
+        errors.verificationCode = 'Please enter the 6-digit verification code';
+      }
     }
 
-    // 验证出生日期
     if (!formData.dob) {
       errors.dob = 'Date of birth is required';
     }
@@ -100,7 +142,6 @@ export default function SignUpForm() {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     
-    // 验证表单
     if (!validateForm()) {
       return;
     }
@@ -127,6 +168,7 @@ export default function SignUpForm() {
           username: formData.username,
           gender: formData.gender as 'MALE' | 'FEMALE' | 'OTHER',
           dob: formData.dob,
+          verificationCode: formData.verificationCode,
         });
       }
 
@@ -141,7 +183,9 @@ export default function SignUpForm() {
           username: '',
           gender: 'OTHER',
           dob: '',
+          verificationCode: '',
         });
+        setCodeSent(false);
       }
     } catch (err) {
       setError('Registration failed, please try again later');
@@ -155,7 +199,6 @@ export default function SignUpForm() {
     <div className="signup-container">
       <h2>User Registration</h2>
       
-      {/* 切换注册方式 */}
       <div className="signup-tabs">
         <button 
           type="button"
@@ -174,7 +217,6 @@ export default function SignUpForm() {
       </div>
 
       <form onSubmit={handleSubmit}>
-        {/* 邮箱 或 手机号 */}
         {signUpMethod === 'email' ? (
           <div className="form-group">
             <label>Email</label>
@@ -190,20 +232,49 @@ export default function SignUpForm() {
             {fieldErrors.email && <span className="field-error">{fieldErrors.email}</span>}
           </div>
         ) : (
-          <div className="form-group">
-            <label>Phone Number</label>
-            <input
-              type="tel"
-              name="phoneNumber"
-              value={formData.phoneNumber}
-              onChange={handleChange}
-              onBlur={handleBlur}
-              required
-              placeholder="10 digits only (e.g., 0412345678)"
-              maxLength={10}
-            />
-            {fieldErrors.phoneNumber && <span className="field-error">{fieldErrors.phoneNumber}</span>}
-          </div>
+          <>
+            {/* 手机号 */}
+            <div className="form-group">
+              <label>Phone Number</label>
+              <div className="input-with-button">
+                <input
+                  type="tel"
+                  name="phoneNumber"
+                  value={formData.phoneNumber}
+                  onChange={handleChange}
+                  onBlur={handleBlur}
+                  required
+                  placeholder="10 digits only"
+                  maxLength={10}
+                />
+                <button
+                  type="button"
+                  onClick={handleSendCode}
+                  disabled={codeSending || countdown > 0}
+                  className="send-code-btn"
+                >
+                  {codeSending ? 'Sending...' : countdown > 0 ? `${countdown}s` : 'Send Code'}
+                </button>
+              </div>
+              {fieldErrors.phoneNumber && <span className="field-error">{fieldErrors.phoneNumber}</span>}
+            </div>
+
+            {/* 验证码 */}
+            <div className="form-group">
+              <label>Verification Code</label>
+              <input
+                type="text"
+                name="verificationCode"
+                value={formData.verificationCode}
+                onChange={handleChange}
+                required
+                placeholder="Enter 6-digit code"
+                maxLength={6}
+              />
+              {fieldErrors.verificationCode && <span className="field-error">{fieldErrors.verificationCode}</span>}
+              {codeSent && <small className="hint">Code sent! Valid for 5 minutes.</small>}
+            </div>
+          </>
         )}
 
         {/* 密码 */}
@@ -263,13 +334,11 @@ export default function SignUpForm() {
           {fieldErrors.dob && <span className="field-error">{fieldErrors.dob}</span>}
         </div>
 
-        {/* 提交按钮 */}
         <button type="submit" disabled={loading}>
           {loading ? 'Registering...' : 'Register'}
         </button>
       </form>
 
-      {/* 显示消息 */}
       {message && <p className="success-message">{message}</p>}
       {error && <p className="error-message">{error}</p>}
     </div>
