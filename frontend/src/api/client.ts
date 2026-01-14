@@ -369,3 +369,47 @@ export async function getOrder(orderId: number): Promise<Order> {
   if (!res.ok) throw new Error('Failed to fetch order');
   return res.json();
 }
+
+// ========== Verification Code API ==========
+
+export interface SendCodeRequest {
+  phoneNumber: string;
+}
+
+export interface SendCodeResponse {
+  message?: string;
+  expiresIn?: number;
+  error?: string;
+}
+
+export interface VerifyCodeRequest {
+  phoneNumber: string;
+  code: string;
+}
+
+// 发送验证码
+export async function sendVerificationCode(
+  data: SendCodeRequest
+): Promise<SendCodeResponse> {
+  try {
+    const res = await fetch(`${API_BASE_URL}/api/verification/send`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(data),
+    });
+    return await res.json();
+  } catch (error) {
+    console.error('[sendVerificationCode] Network error:', error);
+    return { error: 'Network error, please try again' };
+  }
+}
+
+// 更新 PhoneSignUpRequest，添加 verificationCode 字段
+export interface PhoneSignUpRequest {
+  phoneNumber: string;
+  password: string;
+  username: string;
+  gender: 'MALE' | 'FEMALE' | 'OTHER' ;
+  dob: string;
+  verificationCode: string;  // 新增
+}
