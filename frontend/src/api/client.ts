@@ -384,7 +384,12 @@ export interface SendCodeResponse {
   error?: string;
 }
 
-// 发送验证码（支持邮箱和手机）
+export interface VerifyCodeRequest {
+  phoneNumber: string;
+  code: string;
+}
+
+// 发送验证码
 export async function sendVerificationCode(
   data: SendCodeRequest
 ): Promise<SendCodeResponse> {

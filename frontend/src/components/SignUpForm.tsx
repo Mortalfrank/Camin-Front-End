@@ -145,6 +145,10 @@ export default function SignUpForm() {
       if (!phoneResult.isValid) {
         errors.phoneNumber = phoneResult.error || '';
       }
+      // 验证验证码
+      if (!formData.verificationCode || formData.verificationCode.length !== 6) {
+        errors.verificationCode = 'Please enter the 6-digit verification code';
+      }
     }
 
     // 验证验证码
@@ -365,13 +369,11 @@ export default function SignUpForm() {
           {fieldErrors.dob && <span className="field-error">{fieldErrors.dob}</span>}
         </div>
 
-        {/* 提交按钮 */}
         <button type="submit" disabled={loading}>
           {loading ? 'Registering...' : 'Register'}
         </button>
       </form>
 
-      {/* 显示消息 */}
       {message && <p className="success-message">{message}</p>}
       {error && <p className="error-message">{error}</p>}
     </div>
