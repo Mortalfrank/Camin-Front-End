@@ -383,5 +383,61 @@ export interface PhoneSignUpRequest {
   username: string;
   gender: 'MALE' | 'FEMALE' | 'OTHER' ;
   dob: string;
-  verificationCode: string;  // 新增
+  verificationCode: string;
+}
+
+// ========== Password Reset API ==========
+
+export interface ForgotPasswordRequest {
+  method: 'email' | 'phone';
+  email?: string;
+  phoneNumber?: string;
+}
+
+export interface ResetPasswordRequest {
+  method: 'email' | 'phone';
+  email?: string;
+  phoneNumber?: string;
+  verificationCode: string;
+  newPassword: string;
+}
+
+export interface PasswordResetResponse {
+  message?: string;
+  expiresIn?: number;
+  error?: string;
+}
+
+// 发送密码重置验证码
+export async function sendResetCode(
+  data: ForgotPasswordRequest
+): Promise<PasswordResetResponse> {
+  try {
+    const res = await fetch(`${API_BASE_URL}/api/password/forgot`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(data),
+    });
+    return await res.json();
+  } catch (error) {
+    console.error('[sendResetCode] Network error:', error);
+    return { error: 'Network error, please try again' };
+  }
+}
+
+// 重置密码
+export async function resetPassword(
+  data: ResetPasswordRequest
+): Promise<PasswordResetResponse> {
+  try {
+    const res = await fetch(`${API_BASE_URL}/api/password/reset`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(data),
+    });
+    return await res.json();
+  } catch (error) {
+    console.error('[resetPassword] Network error:', error);
+    return { error: 'Network error, please try again' };
+  }
 }
