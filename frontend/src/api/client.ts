@@ -1,5 +1,29 @@
 // src/api/client.ts
 import { API_BASE_URL } from '../config/env';
+
+// 获取当前用户ID（从 localStorage）
+function getCurrentUserId(): number | null {
+  const userStr = localStorage.getItem('user');
+  if (!userStr) return null;
+  try {
+    const user = JSON.parse(userStr);
+    return user?.id ?? null;
+  } catch {
+    return null;
+  }
+}
+
+// 创建带用户ID的请求头
+function getHeaders(includeUserId: boolean = true): Record<string, string> {
+  const headers: Record<string, string> = { 'Content-Type': 'application/json' };
+  if (includeUserId) {
+    const userId = getCurrentUserId();
+    if (userId) {
+      headers['X-USER-ID'] = String(userId);
+    }
+  }
+  return headers;
+}
 import type { Order, PaymentMethod } from '../types';
 
 // Health Check: Returns plain text
@@ -320,7 +344,7 @@ export interface CheckoutRequest {
 export async function checkout(data: CheckoutRequest): Promise<Order> {
   const res = await fetch(`${API_BASE_URL}/api/orders/checkout`, {
     method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
+    headers: getHeaders(),
     body: JSON.stringify(data),
   });
   if (!res.ok) {
@@ -331,13 +355,17 @@ export async function checkout(data: CheckoutRequest): Promise<Order> {
 }
 
 export async function getUserOrders(): Promise<Order[]> {
-  const res = await fetch(`${API_BASE_URL}/api/orders`);
+  const res = await fetch(`${API_BASE_URL}/api/orders`, {
+    headers: getHeaders(),
+  });
   if (!res.ok) throw new Error('Failed to fetch orders');
   return res.json();
 }
 
 export async function getOrder(orderId: number): Promise<Order> {
-  const res = await fetch(`${API_BASE_URL}/api/orders/${orderId}`);
+  const res = await fetch(`${API_BASE_URL}/api/orders/${orderId}`, {
+    headers: getHeaders(),
+  });
   if (!res.ok) throw new Error('Failed to fetch order');
   return res.json();
 }
