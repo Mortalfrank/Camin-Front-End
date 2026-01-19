@@ -5,25 +5,47 @@ export default function Home() {
   const { isLoggedIn } = useAuth();
 
   return (
-    <div className="p-8 text-center">
-      <h2 className="text-4xl font-bold mb-4">Welcome to Camin</h2>
-      <p className="text-gray-600 mb-6">Discover our amazing products</p>
-      <Link
-        to="/products"
-        className="inline-block bg-blue-600 text-white px-6 py-3 rounded hover:bg-blue-700 transition-colors"
-      >
-        Browse Products
-      </Link>
-      {!isLoggedIn() && (
-        <div className="mt-4">
-          <Link to="/login" className="text-blue-600 hover:text-blue-800 mr-4">
-            Login
-          </Link>
-          <Link to="/signup" className="text-blue-600 hover:text-blue-800">
-            Sign Up
-          </Link>
+    <div className="home-shell">
+      <section className="hero-placeholder">
+        <div className="hero-frame">
+          <p className="hero-tag">/SERIES</p>
+          <p className="hero-note">Reserved space for campaign visuals</p>
         </div>
-      )}
+      </section>
+
+      <section className="carousel-block">
+        <div className="carousel-track">
+          <div className="camera-slot large">Feature Slot</div>
+          <div className="camera-slot large">Feature Slot</div>
+        </div>
+        <div className="thumb-row">
+          {Array.from({ length: 8 }).map((_, idx) => (
+            <div key={idx} className="camera-thumb">Item</div>
+          ))}
+        </div>
+      </section>
+
+      <section className="explore-banner">
+        <div className="explore-panel">SS26 · EXPLORE</div>
+        <div className="explore-panel alt">SS26 · EXPLORE</div>
+      </section>
+
+      <section className="sketch-grid">
+        {Array.from({ length: 10 }).map((_, idx) => (
+          <div key={idx} className="sketch-card">CAMIN SKETCH</div>
+        ))}
+      </section>
+
+      <section className="gallery-row">
+        <div className="gallery-tile">Gallery Placeholder</div>
+        <div className="gallery-tile">Gallery Placeholder</div>
+      </section>
+
+      <section className="footer-strip">
+        {Array.from({ length: 4 }).map((_, idx) => (
+          <div key={idx} className="footer-thumb">Thumb</div>
+        ))}
+      </section>
     </div>
   );
 }

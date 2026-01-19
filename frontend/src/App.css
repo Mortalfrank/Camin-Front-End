@@ -1,48 +1,229 @@
 #root {
-  min-height: 100vh;
   width: 100%;
+  min-height: 100vh;
   margin: 0;
   padding: 0;
 }
 
-.logo {
-  height: 6em;
-  padding: 1.5em;
-  will-change: filter;
-  transition: filter 300ms;
-}
-.logo:hover {
-  filter: drop-shadow(0 0 2em #646cffaa);
-}
-.logo.react:hover {
-  filter: drop-shadow(0 0 2em #61dafbaa);
-}
-
-@keyframes logo-spin {
-  from {
-    transform: rotate(0deg);
-  }
-  to {
-    transform: rotate(360deg);
-  }
-}
-
-@media (prefers-reduced-motion: no-preference) {
-  a:nth-of-type(2) .logo {
-    animation: logo-spin infinite 20s linear;
-  }
-}
-
-.card {
-  padding: 2em;
-}
-
-.read-the-docs {
-  color: #888;
-}
-
 .main-content {
-  padding: 30px;
-  max-width: 800px;
+  max-width: 1440px;
   margin: 0 auto;
+  padding: 24px 32px 64px;
+  width: 100%;
+}
+
+.home-shell {
+  display: flex;
+  flex-direction: column;
+  gap: 32px;
+}
+
+.hero-placeholder {
+  border-bottom: 1px solid #0f172a;
+  border-top: 1px solid #0f172a;
+  background: #ffffff;
+}
+
+.hero-frame {
+  min-height: 420px;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-end;
+  padding: 16px;
+}
+
+.hero-tag {
+  margin: 0;
+  font-size: 14px;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: #0f172a;
+}
+
+.hero-note {
+  margin: 6px 0 0;
+  font-size: 12px;
+  color: #475569;
+}
+
+.home-actions h2 {
+  margin: 0 0 8px;
+  font-size: 28px;
+  letter-spacing: 0.02em;
+}
+
+.home-actions p {
+  margin: 0 0 16px;
+  color: #475569;
+}
+
+.cta-row {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+
+.cta-primary {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 12px 18px;
+  border: 1px solid #0f172a;
+  border-radius: 24px;
+  color: #0f172a;
+  text-decoration: none;
+  background: #f7f7f7;
+  letter-spacing: 0.05em;
+  transition: background 0.2s ease, opacity 0.2s ease;
+}
+
+.cta-primary:hover {
+  background: #ececec;
+  opacity: 0.92;
+}
+
+.cta-secondary {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  color: #0f172a;
+}
+
+.cta-secondary a {
+  color: inherit;
+  text-decoration: none;
+  letter-spacing: 0.03em;
+}
+
+.cta-secondary a:hover {
+  opacity: 0.7;
+}
+
+.cta-secondary .dot {
+  color: #94a3b8;
+}
+
+.carousel-block {
+  border-top: 1px solid #0f172a;
+  border-bottom: 1px solid #0f172a;
+  background: #ffffff;
+  padding: 24px 12px;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.carousel-track {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 12px;
+}
+
+.camera-slot {
+  border: 1px solid #0f172a;
+  background: #fdfdfd;
+  min-height: 180px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 12px;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.camera-slot.large {
+  min-height: 260px;
+}
+
+.thumb-row {
+  display: grid;
+  grid-template-columns: repeat(8, minmax(0, 1fr));
+  gap: 8px;
+}
+
+.camera-thumb {
+  border: 1px solid #0f172a;
+  background: #fafafa;
+  min-height: 46px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 11px;
+  letter-spacing: 0.06em;
+}
+
+.explore-banner {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 12px;
+}
+
+.explore-panel {
+  min-height: 260px;
+  background: #0f172a;
+  color: #f5f5f5;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 28px;
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+}
+
+.explore-panel.alt {
+  background: #fdfdfd;
+  color: #0f172a;
+  border: 1px solid #0f172a;
+}
+
+.sketch-grid {
+  display: grid;
+  grid-template-columns: repeat(5, minmax(0, 1fr));
+  gap: 10px;
+}
+
+.sketch-card {
+  min-height: 110px;
+  border: 1px solid #0f172a;
+  background: #fff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 11px;
+  letter-spacing: 0.06em;
+}
+
+.gallery-row {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 12px;
+}
+
+.gallery-tile {
+  min-height: 240px;
+  border: 1px solid #0f172a;
+  background: #fdfdfd;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  letter-spacing: 0.08em;
+}
+
+.footer-strip {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 8px;
+  padding-bottom: 24px;
+}
+
+.footer-thumb {
+  min-height: 100px;
+  border: 1px solid #0f172a;
+  background: #fff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 11px;
+  letter-spacing: 0.06em;
 }

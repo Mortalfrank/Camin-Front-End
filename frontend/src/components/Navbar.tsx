@@ -16,48 +16,41 @@ export default function Navbar() {
 
   return (
     <nav className="navbar">
-      <Link to="/" className="navbar-brand">Camin</Link>
-      <div className="navbar-links">
-        <Link to="/">Home</Link>
-        <Link to="/products">Products</Link>
-        {isLoggedIn() ? (
-          <>
-            
-            {isAdmin() ? (
-              <Link to="/admin">Admin</Link>
-            ) : (
-              <Link to="/orders">My Orders</Link>
-            )}
-            <Link to="/profile">Profile</Link>
-            <Link to="/cart" className="relative flex items-center gap-2">
-              <CartIcon size={20} />
-              <span>Cart</span>
-              {itemCount > 0 && (
-                <span className="absolute -top-2 -right-2 bg-red-500 text-white text-xs rounded-full w-5 h-5 flex items-center justify-center">
-                  {itemCount}
-                </span>
+      <div className="navbar-inner">
+        <Link to="/" className="navbar-brand">CAM_IN</Link>
+
+        <div className="navbar-links">
+          <Link to="/products">Collections</Link>
+          <Link to="/products">Explore</Link>
+          <Link to="/">About</Link>
+        </div>
+
+        <div className="navbar-actions">
+          {isLoggedIn() ? (
+            <>
+              {isAdmin() ? (
+                <Link to="/admin" className="nav-link subtle">Admin</Link>
+              ) : (
+                <Link to="/orders" className="nav-link subtle">My Orders</Link>
               )}
-            </Link>
-            <span className="user-info">Hi, {user.username || 'User'}</span>
-            <button onClick={logout} className="text-red-600 hover:text-red-800">
-              Logout
-            </button>
-          </>
-        ) : (
-          <>
-            <Link to="/cart" className="relative flex items-center gap-2">
-              <CartIcon size={20} />
-              <span>Cart</span>
-              {itemCount > 0 && (
-                <span className="absolute -top-2 -right-2 bg-red-500 text-white text-xs rounded-full w-5 h-5 flex items-center justify-center">
-                  {itemCount}
-                </span>
-              )}
-            </Link>
-             <Link to="/login">Login</Link>
-             <Link to="/signup">Sign Up</Link>
-          </>
-        )}
+              <Link to="/profile" className="nav-link subtle">
+                {user.username || 'Account'}
+              </Link>
+              <button onClick={handleLogout} className="nav-button">Logout</button>
+            </>
+          ) : (
+            <>
+              <Link to="/login" className="nav-link subtle">Login</Link>
+              <Link to="/signup" className="nav-link subtle">Sign Up</Link>
+            </>
+          )}
+
+          <Link to="/cart" className="cart-link">
+            <span className="cart-label">Cart</span>
+            <span className="cart-count">({itemCount})</span>
+            <CartIcon size={18} />
+          </Link>
+        </div>
       </div>
     </nav>
   );
