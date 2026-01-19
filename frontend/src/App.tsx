@@ -21,6 +21,7 @@ import AdminOrderDetail from './admin/orders/AdminOrderDetail';
 import SalesAnalytics from './admin/analytics/SalesAnalytics';
 import ProductAnalytics from './admin/analytics/ProductAnalytics';
 import CustomerAnalytics from './admin/analytics/CustomerAnalytics';
+import ForgotPassword from './pages/ForgotPassword';
 import Profile from './pages/Profile';
 import './App.css';
 
@@ -52,6 +53,7 @@ function AppLayout() {
           <Route path="/orders" element={<Orders />} />
 
           <Route path="/profile" element={<Profile />} />
+          <Route path="/forgot-password" element={<ForgotPassword />} />
 
           {/* Admin login page */}
           <Route path="/admin/login" element={<AdminLogin />} />

@@ -102,3 +102,14 @@
 .signup-link a {
   color: #646cff;
 }
+
+.forgot-link {
+  text-align: right;
+  margin-top: 10px;
+  margin-bottom: 15px;
+}
+
+.forgot-link a {
+  color: #646cff;
+  font-size: 14px;
+}

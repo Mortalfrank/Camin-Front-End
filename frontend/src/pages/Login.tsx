@@ -141,6 +141,10 @@ export default function Login() {
 
       {error && <p className="error-message">{error}</p>}
 
+      <p className="forgot-link">
+        <Link to="/forgot-password">Forgot Password?</Link>
+      </p>
+
       <p className="signup-link">
         Don't have an account? <Link to="/signup">Sign up</Link>
       </p>
