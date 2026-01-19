@@ -1,4 +1,3 @@
-// src/components/SignUpForm.tsx
 import { useState, useEffect } from 'react';
 import { signUpWithEmail, signUpWithPhone, sendVerificationCode } from '../api/client';
 import { 
@@ -40,6 +39,13 @@ export default function SignUpForm() {
     }
   }, [countdown]);
 
+  // 切换注册方式时重置验证码状态
+  useEffect(() => {
+    setCodeSent(false);
+    setCountdown(0);
+    setFormData(prev => ({ ...prev, verificationCode: '' }));
+  }, [signUpMethod]);
+
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
     const { name, value } = e.target;
     setFormData(prev => ({ ...prev, [name]: value }));
@@ -74,25 +80,39 @@ export default function SignUpForm() {
 
   // 发送验证码
   const handleSendCode = async () => {
-    // 先验证手机号
-    const phoneResult = validatePhoneNumber(formData.phoneNumber);
-    if (!phoneResult.isValid) {
-      setFieldErrors(prev => ({ ...prev, phoneNumber: phoneResult.error || '' }));
-      return;
+    setError(null);
+    setMessage(null);
+
+    // 验证输入
+    if (signUpMethod === 'email') {
+      const emailResult = validateEmail(formData.email);
+      if (!emailResult.isValid) {
+        setFieldErrors(prev => ({ ...prev, email: emailResult.error || '' }));
+        return;
+      }
+    } else {
+      const phoneResult = validatePhoneNumber(formData.phoneNumber);
+      if (!phoneResult.isValid) {
+        setFieldErrors(prev => ({ ...prev, phoneNumber: phoneResult.error || '' }));
+        return;
+      }
     }
 
     setCodeSending(true);
-    setError(null);
 
     try {
-      const result = await sendVerificationCode({ phoneNumber: formData.phoneNumber });
+      const result = await sendVerificationCode({
+        method: signUpMethod,
+        email: signUpMethod === 'email' ? formData.email : undefined,
+        phoneNumber: signUpMethod === 'phone' ? formData.phoneNumber : undefined,
+      });
       
       if (result.error) {
         setError(result.error);
       } else {
         setCodeSent(true);
-        setCountdown(60); // 60秒倒计时
-        setMessage('Verification code sent! Check your phone (or console in dev mode)');
+        setCountdown(60);
+        setMessage(`Verification code sent to your ${signUpMethod}! (Check console in dev mode)`);
       }
     } catch (err) {
       setError('Failed to send verification code');
@@ -125,10 +145,11 @@ export default function SignUpForm() {
       if (!phoneResult.isValid) {
         errors.phoneNumber = phoneResult.error || '';
       }
-      // 验证验证码
-      if (!formData.verificationCode || formData.verificationCode.length !== 6) {
-        errors.verificationCode = 'Please enter the 6-digit verification code';
-      }
+    }
+
+    // 验证验证码
+    if (!formData.verificationCode || formData.verificationCode.length !== 6) {
+      errors.verificationCode = 'Please enter the 6-digit verification code';
     }
 
     if (!formData.dob) {
@@ -160,6 +181,7 @@ export default function SignUpForm() {
           username: formData.username,
           gender: formData.gender as 'MALE' | 'FEMALE' | 'OTHER',
           dob: formData.dob,
+          verificationCode: formData.verificationCode,
         });
       } else {
         result = await signUpWithPhone({
@@ -186,6 +208,7 @@ export default function SignUpForm() {
           verificationCode: '',
         });
         setCodeSent(false);
+        setCountdown(0);
       }
     } catch (err) {
       setError('Registration failed, please try again later');
@@ -217,65 +240,73 @@ export default function SignUpForm() {
       </div>
 
       <form onSubmit={handleSubmit}>
+        {/* 邮箱或手机号 + 发送验证码按钮 */}
         {signUpMethod === 'email' ? (
           <div className="form-group">
             <label>Email</label>
-            <input
-              type="email"
-              name="email"
-              value={formData.email}
-              onChange={handleChange}
-              onBlur={handleBlur}
-              required
-              placeholder="Only letters, numbers, and dots allowed"
-            />
+            <div className="input-with-button">
+              <input
+                type="email"
+                name="email"
+                value={formData.email}
+                onChange={handleChange}
+                onBlur={handleBlur}
+                required
+                placeholder="Only letters, numbers, and dots allowed"
+              />
+              <button
+                type="button"
+                onClick={handleSendCode}
+                disabled={codeSending || countdown > 0}
+                className="send-code-btn"
+              >
+                {codeSending ? 'Sending...' : countdown > 0 ? `${countdown}s` : 'Send Code'}
+              </button>
+            </div>
             {fieldErrors.email && <span className="field-error">{fieldErrors.email}</span>}
           </div>
         ) : (
-          <>
-            {/* 手机号 */}
-            <div className="form-group">
-              <label>Phone Number</label>
-              <div className="input-with-button">
-                <input
-                  type="tel"
-                  name="phoneNumber"
-                  value={formData.phoneNumber}
-                  onChange={handleChange}
-                  onBlur={handleBlur}
-                  required
-                  placeholder="10 digits only"
-                  maxLength={10}
-                />
-                <button
-                  type="button"
-                  onClick={handleSendCode}
-                  disabled={codeSending || countdown > 0}
-                  className="send-code-btn"
-                >
-                  {codeSending ? 'Sending...' : countdown > 0 ? `${countdown}s` : 'Send Code'}
-                </button>
-              </div>
-              {fieldErrors.phoneNumber && <span className="field-error">{fieldErrors.phoneNumber}</span>}
-            </div>
-
-            {/* 验证码 */}
-            <div className="form-group">
-              <label>Verification Code</label>
+          <div className="form-group">
+            <label>Phone Number</label>
+            <div className="input-with-button">
               <input
-                type="text"
-                name="verificationCode"
-                value={formData.verificationCode}
+                type="tel"
+                name="phoneNumber"
+                value={formData.phoneNumber}
                 onChange={handleChange}
+                onBlur={handleBlur}
                 required
-                placeholder="Enter 6-digit code"
-                maxLength={6}
+                placeholder="10 digits only"
+                maxLength={10}
               />
-              {fieldErrors.verificationCode && <span className="field-error">{fieldErrors.verificationCode}</span>}
-              {codeSent && <small className="hint">Code sent! Valid for 5 minutes.</small>}
+              <button
+                type="button"
+                onClick={handleSendCode}
+                disabled={codeSending || countdown > 0}
+                className="send-code-btn"
+              >
+                {codeSending ? 'Sending...' : countdown > 0 ? `${countdown}s` : 'Send Code'}
+              </button>
             </div>
-          </>
+            {fieldErrors.phoneNumber && <span className="field-error">{fieldErrors.phoneNumber}</span>}
+          </div>
         )}
+
+        {/* 验证码输入框 */}
+        <div className="form-group">
+          <label>Verification Code</label>
+          <input
+            type="text"
+            name="verificationCode"
+            value={formData.verificationCode}
+            onChange={handleChange}
+            required
+            placeholder="Enter 6-digit code"
+            maxLength={6}
+          />
+          {fieldErrors.verificationCode && <span className="field-error">{fieldErrors.verificationCode}</span>}
+          {codeSent && <small className="hint">Code sent! Valid for 5 minutes.</small>}
+        </div>
 
         {/* 密码 */}
         <div className="form-group">
@@ -334,11 +365,13 @@ export default function SignUpForm() {
           {fieldErrors.dob && <span className="field-error">{fieldErrors.dob}</span>}
         </div>
 
+        {/* 提交按钮 */}
         <button type="submit" disabled={loading}>
           {loading ? 'Registering...' : 'Register'}
         </button>
       </form>
 
+      {/* 显示消息 */}
       {message && <p className="success-message">{message}</p>}
       {error && <p className="error-message">{error}</p>}
     </div>
