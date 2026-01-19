@@ -345,7 +345,9 @@ export async function getOrder(orderId: number): Promise<Order> {
 // ========== Verification Code API ==========
 
 export interface SendCodeRequest {
-  phoneNumber: string;
+  method: 'email' | 'phone';
+  email?: string;
+  phoneNumber?: string;
 }
 
 export interface SendCodeResponse {
@@ -354,12 +356,7 @@ export interface SendCodeResponse {
   error?: string;
 }
 
-export interface VerifyCodeRequest {
-  phoneNumber: string;
-  code: string;
-}
-
-// 发送验证码
+// 发送验证码（支持邮箱和手机）
 export async function sendVerificationCode(
   data: SendCodeRequest
 ): Promise<SendCodeResponse> {
@@ -376,12 +373,22 @@ export async function sendVerificationCode(
   }
 }
 
-// 更新 PhoneSignUpRequest，添加 verificationCode 字段
+// 更新 EmailSignUpRequest，添加 verificationCode 字段
+export interface EmailSignUpRequest {
+  email: string;
+  password: string;
+  username: string;
+  gender: 'MALE' | 'FEMALE' | 'OTHER';
+  dob: string;
+  verificationCode: string;  // 新增
+}
+
+// PhoneSignUpRequest 保持不变
 export interface PhoneSignUpRequest {
   phoneNumber: string;
   password: string;
   username: string;
-  gender: 'MALE' | 'FEMALE' | 'OTHER' ;
+  gender: 'MALE' | 'FEMALE' | 'OTHER';
   dob: string;
   verificationCode: string;
 }
