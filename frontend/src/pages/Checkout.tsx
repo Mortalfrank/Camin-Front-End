@@ -2,7 +2,7 @@
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useCart } from '../context/CartContext';
-import { checkout, CheckoutRequest } from '../api/client';
+import { checkout, CheckoutRequest, createPaypalOrder } from '../api/client';
 import { PaymentMethod } from '../types';
 
 export default function Checkout() {
@@ -47,6 +47,14 @@ export default function Checkout() {
       const order = await checkout(request);
       await clearCart();
       setCheckoutComplete(true);
+
+      if (paymentMethod === 'PAYPAL') {
+        // Ask backend to create a PayPal order and return the user approval link.
+        const paypalOrder = await createPaypalOrder(order.id);
+        window.location.href = paypalOrder.approvalLink;
+        return;
+      }
+
       navigate(`/receipt/${order.id}`);
     } catch (error: any) {
       alert(error.message || 'Checkout failed');

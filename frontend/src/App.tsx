@@ -10,6 +10,7 @@ import ProductDetail from './pages/ProductDetail';
 import Cart from './pages/Cart';
 import Checkout from './pages/Checkout';
 import Receipt from './pages/Receipt';
+import PaypalSuccess from './pages/PaypalSuccess';
 import Orders from './pages/Orders';
 import AdminLogin from './admin/AdminLogin';
 import AdminLayout from './admin/AdminLayout';
@@ -49,6 +50,7 @@ function AppLayout() {
           <Route path="/products/:id" element={<ProductDetail />} />
           <Route path="/cart" element={<Cart />} />
           <Route path="/checkout" element={<Checkout />} />
+          <Route path="/paypal-success" element={<PaypalSuccess />} />
           <Route path="/receipt/:orderId" element={<Receipt />} />
           <Route path="/orders" element={<Orders />} />
 

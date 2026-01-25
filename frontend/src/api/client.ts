@@ -370,6 +370,52 @@ export async function getOrder(orderId: number): Promise<Order> {
   return res.json();
 }
 
+// ========== PayPal API ==========
+export interface CreatePaypalOrderResponse {
+  approvalLink: string;
+  paypalOrderId?: string;
+}
+
+export async function createPaypalOrder(orderId: number): Promise<CreatePaypalOrderResponse> {
+  const res = await fetch(`${API_BASE_URL}/api/payments/paypal/create`, {
+    method: 'POST',
+    headers: getHeaders(),
+    body: JSON.stringify({ orderId }),
+  });
+  if (!res.ok) {
+    const error = await res.json().catch(() => null);
+    throw new Error(error?.message || error?.error || 'Failed to create PayPal order');
+  }
+  return res.json();
+}
+
+export interface CompletePaypalPaymentRequest {
+  orderId: number;
+  paypalOrderId?: string;
+  status?: string;
+  amount?: string;
+}
+
+export interface CompletePaypalPaymentResponse {
+  message?: string;
+  paymentReference?: string;
+}
+
+export async function completePaypalPayment(
+  data: CompletePaypalPaymentRequest
+): Promise<CompletePaypalPaymentResponse> {
+  const res = await fetch(`${API_BASE_URL}/api/payments/paypal/complete`, {
+    method: 'POST',
+    headers: getHeaders(),
+    body: JSON.stringify(data),
+  });
+  if (!res.ok) {
+    const error = await res.json().catch(() => null);
+    throw new Error(error?.message || error?.error || 'Failed to complete PayPal payment');
+  }
+  return res.json();
+}
+
 // ========== Verification Code API ==========
 
 export interface SendCodeRequest {
