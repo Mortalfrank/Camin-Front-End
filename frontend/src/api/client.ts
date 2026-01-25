@@ -240,7 +240,15 @@ export interface UpdateProfileRequest {
   gender?: string;
   dob?: string;
   phoneNumber?: string;
+  phoneVerificationCode?: string;
   email?: string;
+  emailVerificationCode?: string;
+}
+
+export interface SendProfileUpdateCodeRequest {
+  method: 'email' | 'phone';
+  email?: string;
+  phoneNumber?: string;
 }
 
 // 获取用户信息
@@ -254,6 +262,24 @@ export async function getProfile(userId: number): Promise<ProfileResponse | { er
     return await res.json();
   } catch (error) {
     console.error('[getProfile] Network error:', error);
+    return { error: 'Network error, please try again' };
+  }
+}
+
+// 发送更新验证码
+export async function sendProfileUpdateCode(
+  userId: number,
+  data: SendProfileUpdateCodeRequest
+): Promise<{ message?: string; error?: string }> {
+  try {
+    const res = await fetch(`${API_BASE_URL}/api/profile/${userId}/send-code`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(data),
+    });
+    return await res.json();
+  } catch (error) {
+    console.error('[sendProfileUpdateCode] Network error:', error);
     return { error: 'Network error, please try again' };
   }
 }
@@ -286,6 +312,8 @@ export function isProfileError(
 ): response is { error: string } {
   return 'error' in response;
 }
+
+
 // ========== Cart API ==========
 export interface AddToCartRequest {
   productId: number;
