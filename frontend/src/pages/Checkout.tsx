@@ -3,7 +3,9 @@ import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useCart } from '../context/CartContext';
 import { checkout, CheckoutRequest, createPaypalOrder } from '../api/client';
-import { PaymentMethod } from '../types';
+import { Order, PaymentMethod } from '../types';
+import StripeCardForm from '../components/StripeCardForm';
+import { createStripeIntent, completeStripePayment } from '../api/client';
 
 export default function Checkout() {
   const navigate = useNavigate();
@@ -16,6 +18,14 @@ export default function Checkout() {
   const [loading, setLoading] = useState(false);
   const [checkoutComplete, setCheckoutComplete] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [stripeData, setStripeData] = useState<{
+    clientSecret: string;
+    publishableKey: string;
+    orderId: number;
+  } | null>(null);
+  const [confirmedTotal, setConfirmedTotal] = useState<number | null>(null);
+  const [pendingOrder, setPendingOrder] = useState<Order | null>(null);
+
 
   useEffect(() => {
     if (items.length === 0 && !loading && !checkoutComplete) {
@@ -24,7 +34,7 @@ export default function Checkout() {
   }, [items, loading, checkoutComplete, navigate]);
 
   const handleCheckout = async () => {
-    if (items.length === 0) {
+    if (items.length === 0 && !pendingOrder) {
       alert('Cart is empty');
       return;
     }
@@ -36,22 +46,40 @@ export default function Checkout() {
 
     setError(null);
     setLoading(true);
+
     try {
-      const request: CheckoutRequest = { 
-        paymentMethod,
-        deliveryAddress: deliveryAddress.trim(),
-        recipientName: recipientName.trim(),
-        recipientPhoneNumber: recipientPhoneNumber.trim(),
-        receiptEmail: receiptEmail.trim(),
-      };
-      const order = await checkout(request);
-      await clearCart();
-      setCheckoutComplete(true);
+      // 如果订单已创建就复用，不重新下单
+      let order = pendingOrder;
+
+      if (!order) {
+        const request: CheckoutRequest = {
+          paymentMethod,
+          deliveryAddress: deliveryAddress.trim(),
+          recipientName: recipientName.trim(),
+          recipientPhoneNumber: recipientPhoneNumber.trim(),
+          receiptEmail: receiptEmail.trim(),
+        };
+        order = await checkout(request);
+        setConfirmedTotal(order.totalAmount);
+        await clearCart();
+        setCheckoutComplete(true);
+        setPendingOrder(order);
+      }
 
       if (paymentMethod === 'PAYPAL') {
-        // Ask backend to create a PayPal order and return the user approval link.
         const paypalOrder = await createPaypalOrder(order.id);
         window.location.href = paypalOrder.approvalLink;
+        return;
+      }
+
+      if (paymentMethod === 'CREDIT_CARD' || paymentMethod === 'DEBIT_CARD') {
+        const intent = await createStripeIntent(order.id);
+        setStripeData({
+          clientSecret: intent.clientSecret,
+          publishableKey: intent.publishableKey,
+          orderId: order.id,
+        });
+        setLoading(false);
         return;
       }
 
@@ -67,7 +95,6 @@ export default function Checkout() {
     { value: 'CREDIT_CARD', label: 'Credit Card' },
     { value: 'DEBIT_CARD', label: 'Debit Card' },
     { value: 'PAYPAL', label: 'PayPal' },
-    { value: 'BANK_TRANSFER', label: 'Bank Transfer' },
     { value: 'CASH', label: 'Cash on Delivery' },
   ];
 
@@ -89,7 +116,7 @@ export default function Checkout() {
           <div className="border-t pt-2">
             <div className="flex justify-between font-bold text-lg">
               <span>Total:</span>
-              <span>${total.toFixed(2)}</span>
+              <span>${(confirmedTotal ?? total).toFixed(2)}</span>
             </div>
           </div>
         </div>
@@ -152,22 +179,53 @@ export default function Checkout() {
                   name="paymentMethod"
                   value={method.value}
                   checked={paymentMethod === method.value}
-                  onChange={(e) => setPaymentMethod(e.target.value as PaymentMethod)}
+                  onChange={(e) => {
+                    const method = e.target.value as PaymentMethod;
+                    setPaymentMethod(method);
+                    if (method !== 'CREDIT_CARD' && method !== 'DEBIT_CARD') {
+                      setStripeData(null);
+                    }
+                  }}
                   className="w-4 h-4"
                 />
                 <span>{method.label}</span>
               </label>
             ))}
+            {stripeData && (paymentMethod === 'CREDIT_CARD' || paymentMethod === 'DEBIT_CARD') && (
+              <div className="mt-6">
+                <h2 className="text-xl font-semibold mb-4">Enter Card Details</h2>
+                <StripeCardForm
+                  clientSecret={stripeData.clientSecret}
+                  publishableKey={stripeData.publishableKey}
+                  loading={loading}
+                  onSuccess={async (paymentIntentId) => {
+                    setLoading(true);
+                    try {
+                      await completeStripePayment(stripeData.orderId, paymentIntentId);
+                      navigate(`/receipt/${stripeData.orderId}`);
+                    } catch (e: any) {
+                      setError(e.message || 'Payment confirmation failed');
+                    } finally {
+                      setLoading(false);
+                    }
+                  }}
+                  onError={(msg) => setError(msg)}
+                />
+              </div>
+            )}
+
           </div>
 
-          <button
-            onClick={handleCheckout}
-            disabled={loading}
-            className="w-full mt-6 !bg-white !text-black py-3 rounded border !border-black hover:bg-gray-100 disabled:bg-gray-300 disabled:cursor-not-allowed transition-colors font-semibold"
-            style={{ color: '#000', backgroundColor: '#fff' }}
-          >
-            <span className="text-black">{loading ? 'Processing...' : 'Complete Order'}</span>
-          </button>
+          {!stripeData && (
+            <button
+              onClick={handleCheckout}
+              disabled={loading}
+              className="w-full mt-6 !bg-white !text-black py-3 rounded border !border-black hover:bg-gray-100 disabled:bg-gray-300 disabled:cursor-not-allowed transition-colors font-semibold"
+              style={{ color: '#000', backgroundColor: '#fff' }}
+            >
+              <span className="text-black">{loading ? 'Processing...' : 'Complete Order'}</span>
+            </button>
+          )}
           {error && <p className="text-red-600 text-sm mt-3">{error}</p>}
         </div>
       </div>

@@ -550,3 +550,36 @@ export async function resetPassword(
     return { error: 'Network error, please try again' };
   }
 }
+
+// ========== Stripe API ==========
+export interface StripePaymentIntentResponse {
+  orderId: number;
+  clientSecret: string;
+  publishableKey: string;
+}
+
+export async function createStripeIntent(orderId: number): Promise<StripePaymentIntentResponse> {
+  const res = await fetch(`${API_BASE_URL}/api/payments/stripe/create-intent`, {
+    method: 'POST',
+    headers: getHeaders(),
+    body: JSON.stringify({ orderId }),
+  });
+  if (!res.ok) {
+    const error = await res.json().catch(() => null);
+    throw new Error(error?.error || 'Failed to create Stripe payment intent');
+  }
+  return res.json();
+}
+
+export async function completeStripePayment(orderId: number, paymentIntentId: string): Promise<void> {
+  const res = await fetch(`${API_BASE_URL}/api/payments/stripe/complete`, {
+    method: 'POST',
+    headers: getHeaders(),
+    body: JSON.stringify({ orderId, paymentIntentId }),
+  });
+  if (!res.ok) {
+    const error = await res.json().catch(() => null);
+    throw new Error(error?.error || 'Failed to complete Stripe payment');
+  }
+}
+
