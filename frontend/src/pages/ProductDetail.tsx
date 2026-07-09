@@ -13,6 +13,8 @@ export default function ProductDetail() {
   const [quantity, setQuantity] = useState(1);
   const [loading, setLoading] = useState(true);
   const { addToCart } = useCart();
+  const [addingToCart, setAddingToCart] = useState(false);
+  const [cartMessage, setCartMessage] = useState<string | null>(null);
 
   useEffect(() => {
     if (id) {
@@ -36,14 +38,17 @@ export default function ProductDetail() {
   };
 
   const handleAddToCart = async () => {
-    if (!product) return;
+    if (!product || addingToCart) return;
+    setAddingToCart(true);
+    setCartMessage(null);
     try {
       await addToCart(product, quantity);
-      alert('Product added to cart successfully!');
+      setCartMessage('Added to cart!');
+      setTimeout(() => setCartMessage(null), 2000);
     } catch (error: any) {
-      const errorMessage = error.message || 'Failed to add to cart';
-      alert(errorMessage);
-      console.error('Add to cart error:', error);
+      setCartMessage(error.message || 'Failed to add to cart');
+    } finally {
+      setAddingToCart(false);
     }
   };
 
@@ -114,19 +119,20 @@ export default function ProductDetail() {
           </div>
           <button
             onClick={handleAddToCart}
-            disabled={product.stock === 0}
+            disabled={product.stock === 0 || addingToCart}
             className="w-full !bg-white !text-black py-3 rounded border !border-black hover:bg-gray-100 disabled:bg-gray-300 disabled:cursor-not-allowed transition-colors flex items-center justify-center gap-2 font-semibold"
             style={{ color: '#000', backgroundColor: '#fff' }}
           >
-            {product.stock === 0 ? (
-              'Out of Stock'
-            ) : (
+            {product.stock === 0 ? 'Out of Stock' : addingToCart ? 'Adding...' : (
               <>
                 <CartIcon size={20} className="text-black" />
                 <span className="text-black">Add to Cart</span>
               </>
             )}
           </button>
+          {cartMessage && (
+            <p className="mt-2 text-center text-sm text-green-600">{cartMessage}</p>
+          )}
         </div>
       </div>
     </div>

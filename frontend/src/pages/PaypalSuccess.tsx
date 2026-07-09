@@ -1,12 +1,14 @@
 import { useEffect, useState } from 'react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import { completePaypalPayment } from '../api/client';
+import { useCart } from '../context/CartContext';
 
 export default function PaypalSuccess() {
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
+  const { refreshCart } = useCart();
 
   useEffect(() => {
     const orderIdParam = searchParams.get('orderId');
@@ -31,6 +33,9 @@ export default function PaypalSuccess() {
           paypalOrderId: token,
           status: 'COMPLETED',
         });
+        await refreshCart();
+        sessionStorage.removeItem('paypalPendingOrderId');
+        sessionStorage.removeItem('paypalPendingTotal');
         navigate(`/receipt/${orderId}`);
       } catch (err: any) {
         setError(err?.message || 'Failed to confirm PayPal payment');

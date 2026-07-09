@@ -583,3 +583,45 @@ export async function completeStripePayment(orderId: number, paymentIntentId: st
   }
 }
 
+// ========== Shipping Address API ==========
+export interface ShippingAddress {
+  id: number;
+  recipientName: string;
+  phoneNumber: string;
+  address: string;
+  isDefault: boolean;
+}
+
+export async function getShippingAddresses(): Promise<ShippingAddress[]> {
+  const res = await fetch(`${API_BASE_URL}/api/addresses`, { headers: getHeaders() });
+  if (!res.ok) throw new Error('Failed to fetch addresses');
+  return res.json();
+}
+
+export async function addShippingAddress(data: Omit<ShippingAddress, 'id'>): Promise<ShippingAddress> {
+  const res = await fetch(`${API_BASE_URL}/api/addresses`, {
+    method: 'POST',
+    headers: getHeaders(),
+    body: JSON.stringify(data),
+  });
+  if (!res.ok) throw new Error('Failed to add address');
+  return res.json();
+}
+
+export async function updateShippingAddress(id: number, data: Omit<ShippingAddress, 'id'>): Promise<ShippingAddress> {
+  const res = await fetch(`${API_BASE_URL}/api/addresses/${id}`, {
+    method: 'PUT',
+    headers: getHeaders(),
+    body: JSON.stringify(data),
+  });
+  if (!res.ok) throw new Error('Failed to update address');
+  return res.json();
+}
+
+export async function deleteShippingAddress(id: number): Promise<void> {
+  const res = await fetch(`${API_BASE_URL}/api/addresses/${id}`, {
+    method: 'DELETE',
+    headers: getHeaders(),
+  });
+  if (!res.ok) throw new Error('Failed to delete address');
+}

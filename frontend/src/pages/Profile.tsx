@@ -10,6 +10,7 @@ import {
 import { useAuth } from '../context/AuthContext';
 import { validateEmail, validatePhoneNumber, validateUsername } from '../utils/validation';
 import './Profile.css';
+import ShippingAddressManager from '../components/ShippingAddressManager';
 
 export default function Profile() {
   const navigate = useNavigate();
@@ -466,6 +467,8 @@ export default function Profile() {
           {saving ? 'Saving...' : 'Save Changes'}
         </button>
       </form>
+
+      <ShippingAddressManager />
 
       {message && <p className="success-message">{message}</p>}
       {error && <p className="error-message">{error}</p>}
