@@ -1,41 +1,50 @@
 .navbar {
   width: 100%;
-  border-top: 1px solid #0f172a;
-  border-bottom: 1px solid #0f172a;
-  background: #f7f7f7;
+  border-top: 1px solid #020713;
+  border-bottom: 1px solid #020713;
+  background: #ffffff;
+  color: #020713;
 }
 
 .navbar-inner {
   max-width: 1440px;
   margin: 0 auto;
-  padding: 18px 32px;
+  min-height: 64px;
+  padding: 0 32px;
   display: grid;
   grid-template-columns: 1fr auto 1fr;
   align-items: center;
-  gap: 16px;
-  letter-spacing: 0.08em;
+  gap: 24px;
+  font-family: "Courier New", ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+  letter-spacing: 0;
 }
 
 .navbar-brand {
-  font-family: "Courier New", ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", monospace;
-  font-size: 18px;
+  width: 78px;
+  height: 23px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  background: #020713;
+  color: #ffffff;
+  font-size: 16px;
+  line-height: 1;
   font-weight: 700;
-  color: #0f172a;
-  text-decoration: none;
+  letter-spacing: 0;
+  text-transform: uppercase;
 }
 
 .navbar-links {
   display: flex;
   justify-content: center;
-  gap: 32px;
+  gap: 84px;
   text-transform: uppercase;
-  font-size: 13px;
+  font-size: 14px;
+  font-weight: 700;
 }
 
 .navbar-links a {
-  color: #0f172a;
-  text-decoration: none;
-  padding: 6px 4px;
+  padding: 8px 4px;
   transition: opacity 0.2s ease;
 }
 
@@ -47,15 +56,14 @@
   display: flex;
   justify-content: flex-end;
   align-items: center;
-  gap: 14px;
-  font-size: 13px;
+  gap: 22px;
+  font-size: 14px;
+  font-weight: 700;
 }
 
 .nav-link.subtle {
-  color: #0f172a;
-  text-decoration: none;
-  padding: 4px 2px;
-  letter-spacing: 0.05em;
+  padding: 4px 0;
+  letter-spacing: 0;
   transition: opacity 0.2s ease;
 }
 
@@ -64,13 +72,12 @@
 }
 
 .nav-button {
-  border: none;
   background: transparent;
-  color: #0f172a;
-  font-size: 13px;
-  padding: 4px 2px;
-  cursor: pointer;
-  letter-spacing: 0.05em;
+  color: #020713;
+  font-size: 14px;
+  padding: 4px 0;
+  font-weight: 700;
+  letter-spacing: 0;
 }
 
 .nav-button:hover {
@@ -81,26 +88,71 @@
   display: inline-flex;
   align-items: center;
   gap: 6px;
-  color: #0f172a;
-  text-decoration: none;
-  padding: 6px 8px;
-  border: 1px solid #0f172a;
-  border-radius: 18px;
-  background: #fdfdfd;
-  transition: background 0.2s ease, opacity 0.2s ease;
+  padding: 6px 0;
+  background: transparent;
+  text-transform: uppercase;
+  transition: opacity 0.2s ease;
 }
 
 .cart-link:hover {
-  background: #f0f0f0;
   opacity: 0.9;
 }
 
 .cart-label {
   text-transform: uppercase;
-  letter-spacing: 0.08em;
+  letter-spacing: 0;
 }
 
 .cart-count {
   font-variant-numeric: tabular-nums;
-  font-size: 12px;
+  font-size: 13px;
+}
+
+@media (max-width: 980px) {
+  .navbar-inner {
+    grid-template-columns: 1fr auto;
+    min-height: auto;
+    padding: 14px 16px;
+  }
+
+  .navbar-links {
+    grid-column: 1 / -1;
+    order: 3;
+    justify-content: flex-start;
+    gap: 28px;
+    padding-top: 10px;
+    font-size: 13px;
+  }
+
+  .navbar-actions {
+    gap: 12px;
+    font-size: 12px;
+  }
+}
+
+@media (max-width: 640px) {
+  .navbar-inner {
+    padding: 12px 10px;
+  }
+
+  .navbar-brand {
+    width: 66px;
+    height: 21px;
+    font-size: 13px;
+  }
+
+  .navbar-links {
+    gap: 18px;
+    overflow-x: auto;
+    white-space: nowrap;
+  }
+
+  .navbar-actions {
+    gap: 10px;
+  }
+
+  .nav-link.subtle,
+  .nav-button {
+    display: none;
+  }
 }

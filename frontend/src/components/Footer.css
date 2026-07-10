@@ -1,0 +1,253 @@
+.site-footer {
+  position: relative;
+  width: 100%;
+  background: #020713;
+  color: #ffffff;
+  border-top: 1px solid #020713;
+  font-family: "Courier New", ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+}
+
+.footer-inner {
+  max-width: 1440px;
+  margin: 0 auto;
+  padding: 0 32px;
+}
+
+.footer-service-row {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  border-left: 1px solid rgba(255, 255, 255, 0.32);
+  border-right: 1px solid rgba(255, 255, 255, 0.32);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.32);
+}
+
+.footer-service {
+  min-height: 84px;
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  padding: 0 24px;
+  border-right: 1px solid rgba(255, 255, 255, 0.32);
+}
+
+.footer-service:last-child {
+  border-right: 0;
+}
+
+.footer-service span {
+  font-size: 12px;
+  line-height: 1;
+  opacity: 0.68;
+}
+
+.footer-service strong {
+  font-size: 13px;
+  line-height: 1.35;
+  text-transform: uppercase;
+  letter-spacing: 0;
+}
+
+.footer-main {
+  display: grid;
+  grid-template-columns: 1fr 1fr 1.2fr 1.55fr;
+  gap: 48px;
+  padding: 56px 0 52px;
+}
+
+.footer-column h2,
+.footer-brand h2,
+.footer-subscribe label {
+  display: block;
+  margin: 0 0 18px;
+  padding-bottom: 14px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.45);
+  color: #ffffff;
+  font-size: 16px;
+  line-height: 1;
+  font-weight: 700;
+}
+
+.footer-column nav {
+  display: grid;
+  gap: 12px;
+}
+
+.footer-column a,
+.footer-socials a {
+  color: #ffffff;
+  font-size: 13px;
+  line-height: 1;
+  transition: opacity 0.2s ease;
+}
+
+.footer-column a:hover,
+.footer-socials a:hover {
+  opacity: 0.58;
+}
+
+.footer-brand p {
+  max-width: 320px;
+  margin: 0;
+  color: rgba(255, 255, 255, 0.78);
+  font-size: 13px;
+  line-height: 1.65;
+}
+
+.footer-subscribe-row {
+  display: grid;
+  grid-template-columns: 1fr auto;
+  border: 1px solid rgba(255, 255, 255, 0.56);
+}
+
+.footer-subscribe input {
+  min-width: 0;
+  height: 52px;
+  padding: 0 16px;
+  border: 0;
+  border-radius: 0;
+  background: #ffffff;
+  color: #020713;
+  font: inherit;
+  font-size: 13px;
+}
+
+.footer-subscribe input:focus {
+  outline: 2px solid #ffffff;
+  outline-offset: 3px;
+}
+
+.footer-subscribe button {
+  min-width: 108px;
+  height: 52px;
+  border-left: 1px solid #020713;
+  border-radius: 0;
+  background: #ffffff;
+  color: #020713;
+  font: inherit;
+  font-size: 13px;
+  font-weight: 700;
+  text-transform: uppercase;
+}
+
+.footer-subscribe button:hover {
+  background: #dcdcdc;
+}
+
+.footer-message {
+  min-height: 18px;
+  margin: 14px 0 0;
+  color: rgba(255, 255, 255, 0.72);
+  font-size: 12px;
+  line-height: 1.4;
+}
+
+.footer-bottom {
+  min-height: 64px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  border-top: 1px solid rgba(255, 255, 255, 0.32);
+  color: rgba(255, 255, 255, 0.78);
+  font-size: 12px;
+}
+
+.footer-bottom p {
+  margin: 0;
+}
+
+.footer-socials {
+  display: flex;
+  gap: 22px;
+}
+
+.footer-back-top {
+  position: absolute;
+  right: max(32px, calc((100vw - 1440px) / 2 + 32px));
+  bottom: 72px;
+  width: 46px;
+  height: 46px;
+  border: 1px solid rgba(255, 255, 255, 0.72);
+  border-radius: 50%;
+  background: transparent;
+  color: #ffffff;
+  font-size: 24px;
+  line-height: 1;
+}
+
+.footer-back-top:hover {
+  background: #ffffff;
+  color: #020713;
+}
+
+@media (max-width: 980px) {
+  .footer-inner {
+    padding: 0 16px;
+  }
+
+  .footer-service-row {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .footer-service:nth-child(2n) {
+    border-right: 0;
+  }
+
+  .footer-service:nth-child(n + 3) {
+    border-top: 1px solid rgba(255, 255, 255, 0.32);
+  }
+
+  .footer-main {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 36px;
+  }
+}
+
+@media (max-width: 640px) {
+  .footer-inner {
+    padding: 0 10px;
+  }
+
+  .footer-service-row,
+  .footer-main {
+    grid-template-columns: 1fr;
+  }
+
+  .footer-service,
+  .footer-service:nth-child(2n) {
+    min-height: 68px;
+    border-right: 0;
+    border-top: 1px solid rgba(255, 255, 255, 0.32);
+  }
+
+  .footer-service:first-child {
+    border-top: 0;
+  }
+
+  .footer-main {
+    padding: 38px 0;
+  }
+
+  .footer-subscribe-row {
+    grid-template-columns: 1fr;
+  }
+
+  .footer-subscribe button {
+    width: 100%;
+    border-left: 0;
+    border-top: 1px solid #020713;
+  }
+
+  .footer-bottom {
+    align-items: flex-start;
+    flex-direction: column;
+    gap: 18px;
+    padding: 22px 0;
+  }
+
+  .footer-back-top {
+    right: 16px;
+    bottom: 22px;
+    width: 40px;
+    height: 40px;
+  }
+}

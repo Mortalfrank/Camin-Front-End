@@ -42,4 +42,4 @@ export type Order = {
   items: OrderItem[];
 };
 
-export type PaymentMethod = 'CREDIT_CARD' | 'PAYPAL' | 'CASH';
+export type PaymentMethod = 'CREDIT_CARD' | 'DEBIT_CARD' | 'PAYPAL' | 'BANK_TRANSFER' | 'CASH';
