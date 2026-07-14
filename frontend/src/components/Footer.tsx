@@ -91,7 +91,7 @@ export default function Footer() {
         </section>
 
         <section className="footer-bottom">
-          <p>© CAM_IN 2026</p>
+          <p>CAM_IN 2026</p>
           <div className="footer-socials" aria-label="Social links">
             <a href="https://www.instagram.com/" target="_blank" rel="noreferrer">IG</a>
             <a href="https://www.tiktok.com/" target="_blank" rel="noreferrer">TT</a>
@@ -100,7 +100,7 @@ export default function Footer() {
         </section>
       </div>
       <button className="footer-back-top" type="button" onClick={scrollToTop} aria-label="Back to top">
-        ↑
+        UP
       </button>
     </footer>
   );
