@@ -20,6 +20,16 @@
 }
 
 .navbar-brand {
+  position: relative;
+  width: 78px;
+  height: 23px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  color: #020713;
+}
+
+.navbar-brand-mark {
   width: 78px;
   height: 23px;
   display: inline-flex;
@@ -32,6 +42,13 @@
   font-weight: 700;
   letter-spacing: 0;
   text-transform: uppercase;
+  transform-origin: 100% 50%;
+  transition: transform 0.16s ease;
+}
+
+.navbar-brand:hover .navbar-brand-mark,
+.navbar-brand:focus-visible .navbar-brand-mark {
+  animation: logoStrapPull 0.62s cubic-bezier(0.16, 1, 0.3, 1);
 }
 
 .navbar-links {
@@ -96,6 +113,24 @@
 
 .cart-link:hover {
   opacity: 0.9;
+}
+
+@keyframes logoStrapPull {
+  0% {
+    transform: translate(0, 0) rotate(0deg);
+  }
+
+  34% {
+    transform: translate(12px, 3px) rotate(3deg);
+  }
+
+  62% {
+    transform: translate(-4px, -1px) rotate(-1deg);
+  }
+
+  100% {
+    transform: translate(0, 0) rotate(0deg);
+  }
 }
 
 .cart-label {

@@ -17,7 +17,9 @@ export default function Navbar() {
   return (
     <nav className="navbar">
       <div className="navbar-inner">
-        <Link to="/" className="navbar-brand">CAM_IN</Link>
+        <Link to="/" className="navbar-brand" aria-label="CAM_IN home">
+          <span className="navbar-brand-mark">CAM_IN</span>
+        </Link>
 
         <div className="navbar-links">
           <Link to="/products">Collections</Link>

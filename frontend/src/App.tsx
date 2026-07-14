@@ -3,6 +3,7 @@ import { AuthProvider } from './context/AuthContext';
 import { CartProvider } from './context/CartContext';
 import Navbar from './components/Navbar';
 import Footer from './components/Footer';
+import IntroAnimation from './components/IntroAnimation';
 import Home from './pages/Home';
 import Login from './pages/Login';
 import SignUp from './pages/SignUp';
@@ -38,6 +39,7 @@ function AppLayout() {
 
   return (
     <>
+      {!isAdminRoute && <IntroAnimation />}
       {!shouldHideNavbar && <Navbar />}
 
       {/* Only ordinary user pages use the centered width of main-content */}

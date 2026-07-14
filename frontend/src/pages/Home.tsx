@@ -1,4 +1,4 @@
-import { useMemo, useState } from 'react';
+import { useEffect, useMemo, useState, type CSSProperties, type PointerEvent } from 'react';
 import { Link } from 'react-router-dom';
 import heroLeft from '../assets/camin/hero-left.gif';
 import heroRight from '../assets/camin/hero-right.gif';
@@ -16,7 +16,6 @@ import modelRicoh from '../assets/camin/model-ricoh.png';
 import modelFuji from '../assets/camin/frame6-model-fuji.png';
 import bottomLeft from '../assets/camin/bottom-left-cropped.png';
 import bottomRight from '../assets/camin/bottom-right-cropped.png';
-import smallLook from '../assets/camin/frame6-small-look.png';
 
 const seriesItems = [
   { productId: 1, name: 'Fade In', image: seriesLeopard },
@@ -118,6 +117,9 @@ export default function Home() {
   const [activeProcess, setActiveProcess] = useState(0);
   const [activeSkin, setActiveSkin] = useState(0);
   const [activeBody, setActiveBody] = useState(1);
+  const [tilt, setTilt] = useState({ x: 0, y: 0 });
+  const [applyPulse, setApplyPulse] = useState(0);
+  const [isApplying, setIsApplying] = useState(false);
   const maxSeriesStart = Math.max(seriesItems.length - visibleCount, 0);
 
   const visibleSeries = useMemo(
@@ -136,6 +138,47 @@ export default function Home() {
   const showSeriesItem = (index: number) => {
     setSeriesStart(Math.min(Math.max(index, 0), maxSeriesStart));
   };
+
+  const stageStyle = {
+    '--tilt-x': `${tilt.x}deg`,
+    '--tilt-y': `${tilt.y}deg`,
+  } as CSSProperties;
+
+  const updateStageTilt = (event: PointerEvent<HTMLDivElement>) => {
+    const rect = event.currentTarget.getBoundingClientRect();
+    const x = (event.clientX - rect.left) / rect.width;
+    const y = (event.clientY - rect.top) / rect.height;
+
+    setTilt({
+      x: (0.5 - y) * 8,
+      y: (x - 0.5) * 10,
+    });
+  };
+
+  const resetStageTilt = () => {
+    setTilt({ x: 0, y: 0 });
+  };
+
+  const selectSkin = (index: number) => {
+    setActiveSkin(index);
+    setApplyPulse((count) => count + 1);
+  };
+
+  const selectBody = (index: number) => {
+    setActiveBody(index);
+    setApplyPulse((count) => count + 1);
+  };
+
+  useEffect(() => {
+    if (applyPulse === 0) return undefined;
+
+    setIsApplying(true);
+    const timer = window.setTimeout(() => {
+      setIsApplying(false);
+    }, 820);
+
+    return () => window.clearTimeout(timer);
+  }, [applyPulse]);
 
   return (
     <div className="camin-home">
@@ -226,10 +269,6 @@ export default function Home() {
         <img src={bottomRight} alt="CAM_IN lookbook sunset climbing scene" />
       </section>
 
-      <section className="post-lookbook">
-        <img src={smallLook} alt="CAM_IN vertical lookbook detail" />
-      </section>
-
       <section className="skin-studio" aria-label="CAM_IN skin fitting room">
         <div className="skin-studio-copy">
           <span>/FITTING ROOM</span>
@@ -244,7 +283,7 @@ export default function Home() {
                 type="button"
                 className={activeBody === index ? 'active' : ''}
                 key={body.name}
-                onClick={() => setActiveBody(index)}
+                onClick={() => selectBody(index)}
               >
                 {body.name}
               </button>
@@ -252,14 +291,24 @@ export default function Home() {
           </div>
         </div>
 
-        <div className="skin-stage" aria-live="polite">
+        <div
+          className={`skin-stage ${isApplying ? 'applying' : ''}`}
+          aria-live="polite"
+          onPointerMove={updateStageTilt}
+          onPointerLeave={resetStageTilt}
+          style={stageStyle}
+        >
           <img className="skin-stage-base" src={cameraBodies[activeBody].image} alt="" />
           <Link to={`/products/${featuredProducts[activeSkin].productId}`} className="skin-stage-product">
             <img src={featuredProducts[activeSkin].image} alt={featuredProducts[activeSkin].code} />
           </Link>
+          <span className="skin-stage-scan" key={`scan-${applyPulse}`} aria-hidden="true" />
           <div className="skin-stage-meta">
             <span>{featuredProducts[activeSkin].code}</span>
             <span>{cameraBodies[activeBody].name}</span>
+          </div>
+          <div className="skin-stage-status" key={`status-${applyPulse}`}>
+            APPLIED
           </div>
         </div>
 
@@ -269,7 +318,7 @@ export default function Home() {
               type="button"
               className={activeSkin === index ? 'active' : ''}
               key={item.code}
-              onClick={() => setActiveSkin(index)}
+              onClick={() => selectSkin(index)}
               aria-label={`Try ${item.code}`}
             >
               <img src={item.image} alt="" />
