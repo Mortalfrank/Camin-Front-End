@@ -2,6 +2,7 @@
 import { Link } from 'react-router-dom';
 import { useCart } from '../context/CartContext';
 import CartIcon from '../components/CartIcon';
+import { getProductDisplay } from '../utils/productDisplay';
 
 export default function Cart() {
   const { items, total, updateQuantity, removeItem, clearCart, loading } = useCart();
@@ -70,47 +71,54 @@ export default function Cart() {
       </div>
 
       <div className="space-y-4 mb-8">
-        {items.map((item) => (
-          <div key={item.id} className="border rounded-lg p-4 flex gap-4">
-            <img
-              src={item.product.mainImageUrl || 'https://via.placeholder.com/100'}
-              alt={item.product.name}
-              className="w-24 h-24 object-cover rounded"
-            />
-            <div className="flex-1">
-              <Link to={`/products/${item.product.id}`}>
-                <h3 className="font-semibold text-lg hover:text-blue-600">{item.product.name}</h3>
-              </Link>
-              <p className="text-gray-600">${item.product.price.toFixed(2)} each</p>
-              <div className="flex items-center gap-4 mt-2">
-                <div className="flex items-center gap-2">
+        {items.map((item) => {
+          const displayProduct = getProductDisplay(item.product);
+
+          return (
+            <div key={item.id} className="border rounded-lg p-4 flex gap-4">
+              <img
+                src={displayProduct.mainImageUrl || 'https://via.placeholder.com/100'}
+                alt={displayProduct.name}
+                className="w-24 h-24 object-cover rounded"
+              />
+              <div className="flex-1">
+                <Link to={`/products/${item.product.id}`}>
+                  <h3 className="font-semibold text-lg hover:text-blue-600">{displayProduct.name}</h3>
+                </Link>
+                <p className="text-gray-600">
+                  {[displayProduct.model, displayProduct.texture].filter(Boolean).join(' / ')}
+                </p>
+                <p className="text-gray-600">${item.product.price.toFixed(2)} each</p>
+                <div className="flex items-center gap-4 mt-2">
+                  <div className="flex items-center gap-2">
+                    <button
+                      onClick={() => handleQuantityChange(item.id, item.quantity - 1)}
+                      className="w-8 h-8 border rounded flex items-center justify-center hover:bg-gray-100"
+                    >
+                      -
+                    </button>
+                    <span className="w-12 text-center">{item.quantity}</span>
+                    <button
+                      onClick={() => handleQuantityChange(item.id, item.quantity + 1)}
+                      className="w-8 h-8 border rounded flex items-center justify-center hover:bg-gray-100"
+                    >
+                      +
+                    </button>
+                  </div>
                   <button
-                    onClick={() => handleQuantityChange(item.id, item.quantity - 1)}
-                    className="w-8 h-8 border rounded flex items-center justify-center hover:bg-gray-100"
+                    onClick={() => handleRemove(item.id)}
+                    className="text-red-600 hover:text-red-800 ml-4"
                   >
-                    -
-                  </button>
-                  <span className="w-12 text-center">{item.quantity}</span>
-                  <button
-                    onClick={() => handleQuantityChange(item.id, item.quantity + 1)}
-                    className="w-8 h-8 border rounded flex items-center justify-center hover:bg-gray-100"
-                  >
-                    +
+                    Remove
                   </button>
                 </div>
-                <button
-                  onClick={() => handleRemove(item.id)}
-                  className="text-red-600 hover:text-red-800 ml-4"
-                >
-                  Remove
-                </button>
+              </div>
+              <div className="text-right">
+                <p className="font-semibold text-lg">${item.subtotal.toFixed(2)}</p>
               </div>
             </div>
-            <div className="text-right">
-              <p className="font-semibold text-lg">${item.subtotal.toFixed(2)}</p>
-            </div>
-          </div>
-        ))}
+          );
+        })}
       </div>
 
       <div className="border-t pt-4">

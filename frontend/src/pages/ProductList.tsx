@@ -5,6 +5,7 @@ import { useCart } from '../context/CartContext';
 import CartIcon from '../components/CartIcon';
 import { API_BASE_URL } from '../config/env';
 import { getFallbackProductImage } from '../utils/productImages';
+import { caminCatalogItems, getProductDisplay } from '../utils/productDisplay';
 import './ProductList.css';
 
 type Notice = {
@@ -25,10 +26,13 @@ export default function ProductList() {
   }, []);
 
   const filteredProducts = useMemo(() => {
+    const displayProducts = products
+      .slice(0, caminCatalogItems.length)
+      .map((product, index) => getProductDisplay(product, index));
     const term = query.trim().toLowerCase();
-    if (!term) return products;
+    if (!term) return displayProducts;
 
-    return products.filter((product) => {
+    return displayProducts.filter((product) => {
       const content = [
         product.name,
         product.brand,

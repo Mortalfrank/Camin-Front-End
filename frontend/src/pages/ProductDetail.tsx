@@ -5,6 +5,7 @@ import { useCart } from '../context/CartContext';
 import CartIcon from '../components/CartIcon';
 import { API_BASE_URL } from '../config/env';
 import { getFallbackProductImage } from '../utils/productImages';
+import { getProductDisplay } from '../utils/productDisplay';
 import './ProductDetail.css';
 
 type Notice = {
@@ -51,7 +52,7 @@ export default function ProductDetail() {
     setAddingToCart(true);
 
     try {
-      await addToCart(product, quantity);
+      await addToCart(getProductDisplay(product), quantity);
       setNotice({ tone: 'success', text: `${quantity} added to cart.` });
     } catch (error: unknown) {
       const message = error instanceof Error ? error.message : 'Failed to add to cart.';
@@ -74,11 +75,12 @@ export default function ProductDetail() {
     );
   }
 
+  const displayProduct = getProductDisplay(product);
   const details = [
-    ['MODEL', product.model],
-    ['BRAND', product.brand],
-    ['SERIES', product.series],
-    ['TEXTURE', product.texture],
+    ['MODEL', displayProduct.model],
+    ['BRAND', displayProduct.brand],
+    ['SERIES', displayProduct.series],
+    ['TEXTURE', displayProduct.texture],
     ['STOCK', product.stock > 0 ? `${product.stock}` : 'OUT'],
   ].filter(([, value]) => Boolean(value));
 
@@ -98,8 +100,8 @@ export default function ProductDetail() {
         <section className="product-media">
           <div className="product-image-frame">
             <img
-              src={product.mainImageUrl || getFallbackProductImage(product)}
-              alt={product.name}
+              src={displayProduct.mainImageUrl || getFallbackProductImage(product)}
+              alt={displayProduct.name}
               onError={(event) => {
                 event.currentTarget.src = getFallbackProductImage(product);
               }}
@@ -109,7 +111,7 @@ export default function ProductDetail() {
 
         <section className="product-info">
           <p>/PRODUCT VIEW</p>
-          <h1>{product.name}</h1>
+          <h1>{displayProduct.name}</h1>
           <div className="product-price">${product.price.toFixed(2)}</div>
 
           <dl className="product-details">
@@ -121,8 +123,8 @@ export default function ProductDetail() {
             ))}
           </dl>
 
-          {product.description && (
-            <p className="product-description">{product.description}</p>
+          {displayProduct.description && (
+            <p className="product-description">{displayProduct.description}</p>
           )}
 
           <div className="product-actions">
